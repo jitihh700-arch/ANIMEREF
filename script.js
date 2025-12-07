@@ -276,7 +276,7 @@ function toggleVideoSelection(videoId) {
     }
 }
 
-// Importation
+// Importation - MODIFIÉ : PAS DE LIMITE DE TAILLE
 function initImport() {
     const uploadForm = document.getElementById('upload-form');
     
@@ -297,11 +297,11 @@ function initImport() {
             return;
         }
         
-        // Vérifier taille (max 50MB pour GitHub Pages)
-        if (videoFile.size > 50 * 1024 * 1024) {
-            showMessage('Fichier trop volumineux (max 50MB)', 'error');
-            return;
-        }
+        // CRITIQUE : SUPPRIMÉ LA LIMITE 50MB
+        // if (videoFile.size > 50 * 1024 * 1024) {
+        //     showMessage('Fichier trop volumineux (max 50MB)', 'error');
+        //     return;
+        // }
         
         // Créer URL
         const videoURL = URL.createObjectURL(videoFile);
@@ -327,13 +327,21 @@ function initImport() {
         
         // Mettre à jour
         renderLibrary();
-        showMessage('Vidéo importée avec succès !', 'success');
+        showMessage('Vidéo importée avec succès ! Taille: ' + formatFileSize(videoFile.size), 'success');
         
         // Charger si première vidéo
         if (AppState.videos.length === 1) {
             loadVideo(videoId);
         }
     });
+}
+
+// Fonction pour formater la taille
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' bytes';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
+    else return (bytes / 1073741824).toFixed(2) + ' GB';
 }
 
 // Commentaires
