@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://jitihn78o-arcl.github.io/ANIMEREF/sitemap.xml
