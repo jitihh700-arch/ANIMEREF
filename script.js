@@ -297,10 +297,63 @@ function initImport() {
             return;
         }
         
-        // CRITIQUE : SUPPRIMÉ LA LIMITE 50MB
-        // if (videoFile.size > 50 * 1024 * 1024) {
-        //     showMessage('Fichier trop volumineux (max 50MB)', 'error');
-        //     return;
+       // Importation - PAS DE LIMITE DE TAILLE
+function initImport() {
+    const uploadForm = document.getElementById('upload-form');
+    
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!AppState.isAdmin) {
+            showMessage('Admin requis pour importer', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const videoFile = document.getElementById('video-file').files[0];
+        
+        if (!videoFile) {
+            showMessage('Sélectionnez un fichier vidéo', 'error');
+            return;
+        }
+        
+        // IMPORTANT : AUCUNE LIMITE DE TAILLE ICI
+        // Les vidéos peuvent être de n'importe quelle taille
+        
+        // Créer URL
+        const videoURL = URL.createObjectURL(videoFile);
+        const videoId = 'video_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Créer objet vidéo
+        const video = {
+            id: videoId,
+            title: title || 'Vidéo sans titre',
+            description: description,
+            url: videoURL,
+            views: 0,
+            date: new Date().toLocaleDateString('fr-FR'),
+            timestamp: Date.now(),
+            size: videoFile.size // Stocker la taille pour l'affichage
+        };
+        
+        // Ajouter
+        AppState.videos.unshift(video);
+        localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
+        
+        // Réinitialiser formulaire
+        uploadForm.reset();
+        
+        // Mettre à jour
+        renderLibrary();
+        showMessage(`✅ Vidéo importée ! (${formatFileSize(videoFile.size)})`, 'success');
+        
+        // Charger si première vidéo
+        if (AppState.videos.length === 1) {
+            loadVideo(videoId);
+        }
+    });
+}
         // }
         
         // Créer URL
@@ -336,12 +389,63 @@ function initImport() {
     });
 }
 
-// Fonction pour formater la taille
-function formatFileSize(bytes) {
-    if (bytes < 1024) return bytes + ' bytes';
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
-    else return (bytes / 1073741824).toFixed(2) + ' GB';
+// Importation - PAS DE LIMITE DE TAILLE
+function initImport() {
+    const uploadForm = document.getElementById('upload-form');
+    
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!AppState.isAdmin) {
+            showMessage('Admin requis pour importer', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const videoFile = document.getElementById('video-file').files[0];
+        
+        if (!videoFile) {
+            showMessage('Sélectionnez un fichier vidéo', 'error');
+            return;
+        }
+        
+        // IMPORTANT : AUCUNE LIMITE DE TAILLE ICI
+        // Les vidéos peuvent être de n'importe quelle taille
+        
+        // Créer URL
+        const videoURL = URL.createObjectURL(videoFile);
+        const videoId = 'video_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Créer objet vidéo
+        const video = {
+            id: videoId,
+            title: title || 'Vidéo sans titre',
+            description: description,
+            url: videoURL,
+            views: 0,
+            date: new Date().toLocaleDateString('fr-FR'),
+            timestamp: Date.now(),
+            size: videoFile.size // Stocker la taille pour l'affichage
+        };
+        
+        // Ajouter
+        AppState.videos.unshift(video);
+        localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
+        
+        // Réinitialiser formulaire
+        uploadForm.reset();
+        
+        // Mettre à jour
+        renderLibrary();
+        showMessage(`✅ Vidéo importée ! (${formatFileSize(videoFile.size)})`, 'success');
+        
+        // Charger si première vidéo
+        if (AppState.videos.length === 1) {
+            loadVideo(videoId);
+        }
+    });
+}
 }
 
 // Commentaires
