@@ -1,4 +1,4 @@
-// ANIMEREF - Application JavaScript
+// ANIMEREF - Application JavaScript (Version sans limite)
 
 // État global
 const AppState = {
@@ -190,6 +190,9 @@ function renderLibrary() {
         videoCard.className = 'video-card';
         videoCard.dataset.id = video.id;
         
+        // Formater la taille pour l'affichage
+        const sizeText = video.size ? formatFileSize(video.size) : 'Taille inconnue';
+        
         videoCard.innerHTML = `
             ${AppState.isAdmin ? `
                 <div style="position: absolute; top: 10px; left: 10px;">
@@ -204,6 +207,7 @@ function renderLibrary() {
                 <div class="video-card-title">${video.title}</div>
                 <div class="video-card-details">
                     <span>${video.views || 0} vues</span>
+                    <span>${sizeText}</span>
                     <span>${video.date || 'Date inconnue'}</span>
                 </div>
                 ${AppState.isAdmin ? `
@@ -276,7 +280,7 @@ function toggleVideoSelection(videoId) {
     }
 }
 
-// Importation - MODIFIÉ : PAS DE LIMITE DE TAILLE
+// Importation - VERSION SANS LIMITE DE TAILLE
 function initImport() {
     const uploadForm = document.getElementById('upload-form');
     
@@ -297,29 +301,8 @@ function initImport() {
             return;
         }
         
-       // Importation - PAS DE LIMITE DE TAILLE
-function initImport() {
-    const uploadForm = document.getElementById('upload-form');
-    
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!AppState.isAdmin) {
-            showMessage('Admin requis pour importer', 'error');
-            return;
-        }
-        
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('description').value;
-        const videoFile = document.getElementById('video-file').files[0];
-        
-        if (!videoFile) {
-            showMessage('Sélectionnez un fichier vidéo', 'error');
-            return;
-        }
-        
-        // IMPORTANT : AUCUNE LIMITE DE TAILLE ICI
-        // Les vidéos peuvent être de n'importe quelle taille
+        // IMPORTANT : AUCUNE LIMITE DE TAILLE - VIDÉOS ILLIMITÉES
+        // Vous pouvez importer des vidéos de n'importe quelle taille
         
         // Créer URL
         const videoURL = URL.createObjectURL(videoFile);
@@ -346,41 +329,10 @@ function initImport() {
         
         // Mettre à jour
         renderLibrary();
-        showMessage(`✅ Vidéo importée ! (${formatFileSize(videoFile.size)})`, 'success');
         
-        // Charger si première vidéo
-        if (AppState.videos.length === 1) {
-            loadVideo(videoId);
-        }
-    });
-}
-        // }
-        
-        // Créer URL
-        const videoURL = URL.createObjectURL(videoFile);
-        const videoId = 'video_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        
-        // Créer objet vidéo
-        const video = {
-            id: videoId,
-            title: title || 'Vidéo sans titre',
-            description: description,
-            url: videoURL,
-            views: 0,
-            date: new Date().toLocaleDateString('fr-FR'),
-            timestamp: Date.now()
-        };
-        
-        // Ajouter
-        AppState.videos.unshift(video);
-        localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
-        
-        // Réinitialiser formulaire
-        uploadForm.reset();
-        
-        // Mettre à jour
-        renderLibrary();
-        showMessage('Vidéo importée avec succès ! Taille: ' + formatFileSize(videoFile.size), 'success');
+        // Message avec taille
+        const sizeFormatted = formatFileSize(videoFile.size);
+        showMessage(`✅ Vidéo importée avec succès ! (${sizeFormatted})`, 'success');
         
         // Charger si première vidéo
         if (AppState.videos.length === 1) {
@@ -389,63 +341,15 @@ function initImport() {
     });
 }
 
-// Importation - PAS DE LIMITE DE TAILLE
-function initImport() {
-    const uploadForm = document.getElementById('upload-form');
+// Fonction pour afficher la taille de façon lisible
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
     
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!AppState.isAdmin) {
-            showMessage('Admin requis pour importer', 'error');
-            return;
-        }
-        
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('description').value;
-        const videoFile = document.getElementById('video-file').files[0];
-        
-        if (!videoFile) {
-            showMessage('Sélectionnez un fichier vidéo', 'error');
-            return;
-        }
-        
-        // IMPORTANT : AUCUNE LIMITE DE TAILLE ICI
-        // Les vidéos peuvent être de n'importe quelle taille
-        
-        // Créer URL
-        const videoURL = URL.createObjectURL(videoFile);
-        const videoId = 'video_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        
-        // Créer objet vidéo
-        const video = {
-            id: videoId,
-            title: title || 'Vidéo sans titre',
-            description: description,
-            url: videoURL,
-            views: 0,
-            date: new Date().toLocaleDateString('fr-FR'),
-            timestamp: Date.now(),
-            size: videoFile.size // Stocker la taille pour l'affichage
-        };
-        
-        // Ajouter
-        AppState.videos.unshift(video);
-        localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
-        
-        // Réinitialiser formulaire
-        uploadForm.reset();
-        
-        // Mettre à jour
-        renderLibrary();
-        showMessage(`✅ Vidéo importée ! (${formatFileSize(videoFile.size)})`, 'success');
-        
-        // Charger si première vidéo
-        if (AppState.videos.length === 1) {
-            loadVideo(videoId);
-        }
-    });
-}
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 // Commentaires
