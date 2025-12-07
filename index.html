@@ -3,88 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIMEREF</title>
-    <style>
-        /* Style basique pour commencer */
-        body { margin: 0; background: #0f1015; color: white; font-family: Arial; }
-        header { background: #23252b; padding: 15px 20px; display: flex; justify-content: space-between; border-bottom: 3px solid #f47521; }
-        .logo { color: #f47521; font-size: 28px; font-weight: bold; }
-        nav ul { display: flex; list-style: none; gap: 20px; }
-        nav a { color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; }
-        nav a:hover { background: rgba(244, 117, 33, 0.2); }
-        .main-container { display: flex; min-height: 80vh; }
-        .sidebar { width: 200px; background: #23252b; padding: 20px; }
-        .content { flex: 1; padding: 20px; }
-        .video-player { background: #000; padding: 20px; text-align: center; min-height: 300px; }
-        footer { text-align: center; padding: 20px; background: #23252b; margin-top: 20px; }
-        .hidden { display: none; }
-        .section { display: none; }
-        .section.active { display: block; }
-    </style>
+    <title>ANIMEREF - Votre plateforme d'anime</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <div class="logo">ANIMEREF</div>
+        <div class="logo">
+            <i class="fas fa-play-circle"></i>
+            <span>ANIMEREF</span>
+        </div>
         <nav>
             <ul>
-                <li><a href="#" onclick="showSection('home')">Accueil</a></li>
-                <li><a href="#" onclick="showSection('history')">Historique</a></li>
-                <li><a href="#" onclick="showSection('library')">Bibliothèque</a></li>
-                <li><a href="#" onclick="showSection('import')">Importer</a></li>
+                <li><a href="#" id="nav-home" class="active"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="#" id="nav-history"><i class="fas fa-history"></i> Historique</a></li>
+                <li><a href="#" id="nav-library"><i class="fas fa-film"></i> Bibliothèque</a></li>
+                <li><a href="#" id="nav-import"><i class="fas fa-upload"></i> Importer</a></li>
             </ul>
         </nav>
     </header>
 
     <div class="main-container">
         <div class="sidebar">
-            <h3>Menu</h3>
-            <p><a href="#" onclick="showSection('home')">▶ Vidéo en cours</a></p>
-            <p><a href="#" onclick="toggleAdmin()">👑 Mode Admin</a></p>
+            <div class="sidebar-section">
+                <h3><i class="fas fa-fire"></i> Tendance</h3>
+                <a href="#" class="sidebar-item active" data-section="home">
+                    <i class="fas fa-play"></i> Vidéo en cours
+                </a>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-user"></i> Mon Compte</h3>
+                <div class="sidebar-item" id="admin-toggle">
+                    <i class="fas fa-crown"></i> Mode Admin
+                </div>
+            </div>
         </div>
 
         <div class="content">
-            <div id="home" class="section active">
-                <h2>Lecteur vidéo</h2>
-                <div class="video-player">
-                    <p>🎬 Sélectionnez une vidéo dans la bibliothèque</p>
+            <div id="home-section" class="section active">
+                <div class="video-player-container">
+                    <div class="video-title" id="current-video-title">
+                        Aucune vidéo sélectionnée
+                    </div>
+                    <div class="video-player">
+                        <div class="no-video-selected" id="no-video-message">
+                            <i class="fas fa-film" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <p>Sélectionnez une vidéo dans la bibliothèque pour commencer la lecture</p>
+                        </div>
+                        <video id="video-player" controls class="hidden">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                    </div>
+                    <div class="video-actions">
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="play-btn">
+                                <i class="fas fa-play"></i> Lire
+                            </button>
+                            <button class="btn btn-secondary" id="pause-btn">
+                                <i class="fas fa-pause"></i> Pause
+                            </button>
+                            <button class="btn btn-danger hidden" id="delete-current-btn">
+                                <i class="fas fa-trash"></i> Supprimer cette vidéo
+                            </button>
+                        </div>
+                        <div class="like-section">
+                            <button class="like-btn" id="like-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <div class="views">
+                                <i class="fas fa-eye"></i> <span id="views-count">0</span> vues
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3>Commentaires</h3>
-                <input type="text" placeholder="Votre commentaire...">
-                <button>Publier</button>
+
+                <div class="comments-container">
+                    <h3 class="comments-title">Commentaires</h3>
+                    <div class="comment-form">
+                        <input type="text" class="comment-input" id="comment-input" placeholder="Ajouter un commentaire...">
+                        <button class="btn btn-primary" id="add-comment-btn">
+                            <i class="fas fa-paper-plane"></i> Publier
+                        </button>
+                    </div>
+                    <div class="comment-list" id="comment-list">
+                        <div class="message">
+                            Aucun commentaire pour le moment. Soyez le premier à commenter !
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div id="history" class="section">
-                <h2>Historique</h2>
-                <p>Aucun historique pour le moment.</p>
+            <!-- Autres sections (Historique, Bibliothèque, Importer) -->
+            <div id="history-section" class="section">
+                <h2><i class="fas fa-history"></i> Historique</h2>
+                <div class="history-container">
+                    <div class="history-list" id="history-list">
+                        <div class="message">Aucune vidéo visionnée.</div>
+                    </div>
+                </div>
             </div>
 
-            <div id="library" class="section">
-                <h2>Bibliothèque</h2>
-                <p>Aucune vidéo importée.</p>
+            <div id="library-section" class="section">
+                <h2><i class="fas fa-film"></i> Bibliothèque</h2>
+                <div class="library-container" id="library-container">
+                    <div class="message">Aucune vidéo importée.</div>
+                </div>
             </div>
 
-            <div id="import" class="section">
-                <h2>Importer une vidéo</h2>
-                <p><input type="file" accept="video/*"></p>
-                <button>Importer</button>
+            <div id="import-section" class="section">
+                <h2><i class="fas fa-upload"></i> Importer</h2>
+                <div class="import-container">
+                    <form class="import-form" id="import-form">
+                        <div class="form-group">
+                            <label for="video-title">Titre de la vidéo</label>
+                            <input type="text" id="video-title" class="form-control" placeholder="Titre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="video-file">Fichier vidéo</label>
+                            <input type="file" id="video-file" class="form-control" accept="video/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-upload"></i> Importer
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>ANIMEREF © 2025</p>
+        <p>ANIMEREF &copy; 2025 - Votre plateforme d'anime préférée</p>
     </footer>
 
-    <script>
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            return false;
-        }
-        
-        function toggleAdmin() {
-            alert('Mode Admin activé! (Version simplifiée)');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
