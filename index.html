@@ -13,12 +13,36 @@
 </head>
 <body>
     <!-- Header -->
-    <header>
-        <header>
-    <div class="logo">
-        <i class="fas fa-play-circle"></i>
-        <span>ANIMEREF</span>
+      <!-- Barre de recherche -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Rechercher des vidéos...">
+        <button id="search-btn" class="btn btn-secondary">
+            <i class="fas fa-search"></i>
+        </button>
     </div>
+    
+    <div class="header-right">
+        <!-- Bouton Dons -->
+        <button id="donate-btn" class="btn btn-warning">
+            <i class="fas fa-heart"></i> Dons
+        </button>
+        
+        <!-- Section Auth -->
+        <div id="auth-section">
+            <button onclick="showModal('auth-modal')" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Connexion
+            </button>
+        </div>
+        
+        <!-- Section Utilisateur Connecté -->
+        <div id="user-section" style="display: none;">
+            <span id="username-display" class="username"></span>
+            <button id="logout-btn" class="btn btn-secondary">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</header>
     
     <nav>
         <ul>
