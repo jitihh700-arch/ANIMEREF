@@ -2,9 +2,6 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <head>
-    <meta charset="UTF-8">
-   <meta name="google-site-verification" content="abc123xyz456def789" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ANIMEREF - Votre plateforme d'anime</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,164 +10,92 @@
 </head>
 <body>
     <!-- Header -->
-      <!-- Barre de recherche -->
-    <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Rechercher des vidéos...">
-        <button id="search-btn" class="btn btn-secondary">
-            <i class="fas fa-search"></i>
-        </button>
-    </div>
-    
-    <div class="header-right">
-        <!-- Bouton Dons -->
-        <button id="donate-btn" class="btn btn-warning">
-            <i class="fas fa-heart"></i> Dons
-        </button>
-        
-        <!-- Section Auth -->
-        <div id="auth-section">
-            <button onclick="showModal('auth-modal')" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> Connexion
-            </button>
-        </div>
-        
-        <!-- Section Utilisateur Connecté -->
-        <div id="user-section" style="display: none;">
-            <span id="username-display" class="username"></span>
-            <button id="logout-btn" class="btn btn-secondary">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-    </div>
-</header>
-    
-    <nav>
-        <ul>
-            <li><a href="#" id="nav-home" class="nav-link active"><i class="fas fa-home"></i> Accueil</a></li>
-            <li><a href="#" id="nav-history" class="nav-link"><i class="fas fa-history"></i> Historique</a></li>
-            <li><a href="#" id="nav-library" class="nav-link"><i class="fas fa-film"></i> Bibliothèque</a></li>
-            <li><a href="#" id="nav-subscriptions" class="nav-link"><i class="fas fa-users"></i> Abonnements</a></li>
-            <li><a href="#" id="nav-upload" class="nav-link"><i class="fas fa-upload"></i> Upload</a></li>
-        </ul>
-    </nav>
-    
-    <div class="header-right">
-        <!-- Bouton Dons -->
-        <button id="donate-btn" class="btn btn-warning">
-            <i class="fas fa-heart"></i> Faire un don
-        </button>
-        
-        <!-- Section non connecté -->
-        <div id="auth-section" class="auth-section">
-            <button id="login-btn" class="btn btn-secondary">Connexion</button>
-            <button id="register-btn" class="btn btn-primary">Inscription</button>
-        </div>
-        
-        <!-- Section connecté -->
-        <div id="user-section" class="user-section" style="display: none;">
-            <span id="username-display" style="margin-right: 10px;"></span>
-            <button id="logout-btn" class="btn btn-secondary">Déconnexion</button>
-        </div>
-    </div>
-</header>
+    <header>
         <div class="logo">
             <i class="fas fa-play-circle"></i>
             <span>ANIMEREF</span>
         </div>
+        
         <nav>
             <ul>
                 <li><a href="#" id="nav-home" class="nav-link active"><i class="fas fa-home"></i> Accueil</a></li>
                 <li><a href="#" id="nav-history" class="nav-link"><i class="fas fa-history"></i> Historique</a></li>
                 <li><a href="#" id="nav-library" class="nav-link"><i class="fas fa-film"></i> Bibliothèque</a></li>
-                <li><a href="#" id="nav-import" class="nav-link"><i class="fas fa-upload"></i> Importer</a></li>
+                <li><a href="#" id="nav-upload" class="nav-link"><i class="fas fa-upload"></i> Importer</a></li>
             </ul>
         </nav>
+        
+        <div class="header-right">
+            <div id="auth-section">
+                <button id="login-btn" class="btn btn-secondary">Connexion</button>
+                <button id="register-btn" class="btn btn-primary">Inscription</button>
+            </div>
+            
+            <div id="user-section" style="display: none;">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="btn btn-secondary">Déconnexion</button>
+            </div>
+            
+            <button id="donate-btn" class="btn btn-warning">
+                <i class="fas fa-heart"></i> Dons
+            </button>
+        </div>
     </header>
 
-    <div class="sidebar">
-    <!-- Section Navigation -->
-    <div class="sidebar-section">
-        <h3><i class="fas fa-compass"></i> Navigation</h3>
-        <a href="#home-section" class="sidebar-item active" data-section="home">
-            <i class="fas fa-home"></i> Accueil
-        </a>
-        <a href="#history-section" class="sidebar-item" data-section="history">
-            <i class="fas fa-history"></i> Historique
-        </a>
-        <a href="#subscriptions-section" class="sidebar-item" data-section="subscriptions">
-            <i class="fas fa-users"></i> Abonnements
-        </a>
-        <a href="#likes-section" class="sidebar-item" data-section="likes">
-            <i class="fas fa-heart"></i> Vidéos aimées
-        </a>
-        <a href="#trending-section" class="sidebar-item" data-section="trending">
-            <i class="fas fa-fire"></i> Tendances
-        </a>
-    </div>
-    
-    <!-- Section Création (visible seulement si connecté) -->
-    <div class="sidebar-section upload-only" style="display: none;">
-        <h3><i class="fas fa-plus-circle"></i> Création</h3>
-        <a href="#upload-section" class="sidebar-item" data-section="upload">
-            <i class="fas fa-upload"></i> Upload une vidéo
-        </a>
-        <a href="#my-videos-section" class="sidebar-item" data-section="my-videos">
-            <i class="fas fa-film"></i> Mes vidéos
-        </a>
-        <a href="#channel-section" class="sidebar-item" data-section="channel">
-            <i class="fas fa-user-circle"></i> Ma chaîne
-        </a>
-    </div>
-    
-    <!-- Section Abonnements rapides -->
-    <div class="sidebar-section">
-        <h3><i class="fas fa-user-friends"></i> Abonnements</h3>
-        <div id="quick-subs" class="quick-subs">
-            <p class="empty-message">Connectez-vous pour voir vos abonnements</p>
-        </div>
-    </div>
-    
-    <!-- Section Tendances -->
-    <div class="sidebar-section">
-        <h3><i class="fas fa-chart-line"></i> Tendance du jour</h3>
-        <div class="trending-tags">
-            <span class="tag">#AMV</span>
-            <span class="tag">#Original</span>
-            <span class="tag">#Animation</span>
-            <span class="tag">#Fanart</span>
-            <span class="tag">#Manga</span>
-            <span class="tag">#Création</span>
-        </div>
-    </div>
-    
-    <!-- Bouton Dons dans sidebar -->
-    <div class="sidebar-donate">
-        <button id="sidebar-donate" class="btn btn-warning btn-block">
-            <i class="fas fa-heart"></i> Soutenir ANIMEREF
-        </button>
-        <p class="donate-note">
-            <small>Les dons aident à garder le site gratuit pour tous</small>
-        </p>
-    </div>
-</div>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3><i class="fas fa-fire"></i> Tendance</h3>
+                <a href="#" class="sidebar-item active" data-section="home">
+                    <i class="fas fa-play"></i> Vidéo en cours
+                </a>
+                <a href="#" class="sidebar-item" data-section="trending">
+                    <i class="fas fa-chart-line"></i> Vidéos populaires
+                </a>
+            </div>
             
             <div class="sidebar-section">
                 <h3><i class="fas fa-user"></i> Mon Compte</h3>
                 <div class="sidebar-item" id="admin-toggle">
                     <i class="fas fa-crown"></i> <span id="admin-text">Mode Admin</span>
                 </div>
+                <div class="sidebar-item" id="my-videos-btn">
+                    <i class="fas fa-film"></i> Mes vidéos
+                </div>
+                <div class="sidebar-item" id="subscriptions-btn">
+                    <i class="fas fa-users"></i> Mes abonnements
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-cog"></i> Paramètres</h3>
+                <div class="sidebar-item" id="clear-history-btn">
+                    <i class="fas fa-trash"></i> Vider l'historique
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button id="sidebar-donate" class="btn btn-warning btn-block">
+                    <i class="fas fa-heart"></i> Soutenir le projet
+                </button>
+                <p class="donate-note">
+                    <small>Les dons aident à garder le site gratuit</small>
+                </p>
             </div>
         </div>
 
         <!-- Content -->
         <div class="content">
-            <!-- Home Section -->
+            <!-- Accueil Section -->
             <div id="home-section" class="section active">
                 <div class="video-container">
                     <div class="video-header">
-                        <h2 id="video-title">Aucune vidéo sélectionnée</h2>
-                        <div class="video-views">
-                            <i class="fas fa-eye"></i> <span id="views-count">0</span> vues
+                        <h2 id="current-video-title">Aucune vidéo sélectionnée</h2>
+                        <div class="video-meta">
+                            <span id="video-views"><i class="fas fa-eye"></i> 0 vues</span>
+                            <span id="video-date">-</span>
                         </div>
                     </div>
                     
@@ -185,22 +110,31 @@
                     </div>
                     
                     <div class="video-controls">
-                        <button id="play-btn" class="btn btn-primary">
-                            <i class="fas fa-play"></i> Lire
-                        </button>
-                        <button id="pause-btn" class="btn btn-secondary">
-                            <i class="fas fa-pause"></i> Pause
-                        </button>
-                        <button id="like-btn" class="btn-like">
-                            <i class="far fa-heart"></i> <span id="like-count">0</span>
-                        </button>
-                        <button id="delete-btn" class="btn btn-danger" style="display: none;">
-                            <i class="fas fa-trash"></i> Supprimer
-                        </button>
+                        <div class="video-actions">
+                            <button id="play-btn" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Lire
+                            </button>
+                            <button id="pause-btn" class="btn btn-secondary">
+                                <i class="fas fa-pause"></i> Pause
+                            </button>
+                            <button id="like-btn" class="btn-like">
+                                <i class="far fa-heart"></i> <span id="like-count">0</span>
+                            </button>
+                            <button id="subscribe-btn" class="btn btn-primary" style="display: none;">
+                                <i class="fas fa-user-plus"></i> S'abonner
+                            </button>
+                            <button id="delete-video-btn" class="btn btn-danger" style="display: none;">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                        
+                        <div class="video-author">
+                            Par <span id="video-author">-</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Comments -->
+                <!-- Commentaires -->
                 <div class="comments-section">
                     <h3><i class="fas fa-comments"></i> Commentaires</h3>
                     <div class="comment-form">
@@ -215,58 +149,155 @@
                 </div>
             </div>
 
-            <!-- History Section -->
+            <!-- Historique Section -->
             <div id="history-section" class="section">
                 <h2><i class="fas fa-history"></i> Historique de visionnage</h2>
-                <div id="history-list" class="history-list">
+                <div class="history-list" id="history-list">
                     <p class="empty-message">Aucune vidéo visionnée.</p>
                 </div>
             </div>
 
-            <!-- Library Section -->
+            <!-- Bibliothèque Section -->
             <div id="library-section" class="section">
-                <h2><i class="fas fa-film"></i> Bibliothèque</h2>
-                <div id="library-controls" style="display: none; margin-bottom: 20px;">
-                    <button id="delete-selected" class="btn btn-danger">
+                <div class="library-header">
+                    <h2><i class="fas fa-film"></i> Bibliothèque</h2>
+                    <div class="library-search">
+                        <input type="text" id="search-input" placeholder="Rechercher une vidéo...">
+                        <button id="search-btn" class="btn btn-secondary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="admin-controls" style="display: none; margin-bottom: 20px;">
+                    <button id="delete-selected-btn" class="btn btn-danger">
                         <i class="fas fa-trash"></i> Supprimer la sélection
                     </button>
                 </div>
-                <div id="library-grid" class="library-grid">
+                
+                <div class="library-grid" id="library-grid">
                     <p class="empty-message">Aucune vidéo importée.</p>
                 </div>
             </div>
 
-            <!-- Import Section -->
-            <div id="import-section" class="section">
+            <!-- Importer Section -->
+            <div id="upload-section" class="section">
                 <h2><i class="fas fa-upload"></i> Importer une vidéo</h2>
-                <div class="import-form-container">
-                    <form id="upload-form">
-                        <div class="form-group">
-                            <label for="title">Titre de la vidéo *</label>
-                            <input type="text" id="title" class="form-input" required placeholder="Ex: Attack on Titan - Épisode 1">
+                
+                <div class="upload-steps">
+                    <div class="step-indicator active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Fichier</div>
+                    </div>
+                    <div class="step-indicator">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Infos</div>
+                    </div>
+                    <div class="step-indicator">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Vérification</div>
+                    </div>
+                </div>
+                
+                <!-- Étape 1: Sélection du fichier -->
+                <div id="step1" class="upload-step">
+                    <h4><i class="fas fa-file-video"></i> Sélectionnez votre vidéo</h4>
+                    <div class="form-group">
+                        <input type="file" id="video-file" class="form-control" accept="video/*" required>
+                        <small>Formats supportés: MP4, WebM, MOV</small>
+                    </div>
+                    
+                    <div id="file-info" style="display: none; margin-top: 20px; padding: 15px; background: rgba(244, 117, 33, 0.1); border-radius: 8px;">
+                        <p><strong>Fichier sélectionné:</strong> <span id="file-name"></span></p>
+                        <p><strong>Taille:</strong> <span id="file-size"></span></p>
+                    </div>
+                    
+                    <div class="upload-buttons">
+                        <button id="step1-next" class="btn btn-primary" disabled>
+                            Suivant <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Étape 2: Informations -->
+                <div id="step2" class="upload-step" style="display: none;">
+                    <h4><i class="fas fa-info-circle"></i> Informations sur la vidéo</h4>
+                    
+                    <div class="form-group">
+                        <label for="video-title">Titre de la vidéo *</label>
+                        <input type="text" id="video-title" class="form-control" placeholder="Titre original" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-description">Description</label>
+                        <textarea id="video-description" class="form-control" rows="3" placeholder="Décrivez votre vidéo..."></textarea>
+                    </div>
+                    
+                    <div class="upload-buttons">
+                        <button id="step2-back" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                        <button id="step2-next" class="btn btn-primary">
+                            Suivant <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Étape 3: Vérification -->
+                <div id="step3" class="upload-step" style="display: none;">
+                    <h4><i class="fas fa-shield-alt"></i> Vérification du contenu</h4>
+                    
+                    <div id="copyright-check" class="copyright-checkbox">
+                        <label>
+                            <input type="checkbox" id="copyright-agree" required>
+                            Je certifie que cette vidéo est ma création originale
+                        </label>
+                        <div class="copyright-list">
+                            <p>• Je ne viole aucun droit d'auteur</p>
+                            <p>• Je suis le propriétaire du contenu</p>
+                            <p>• Ce n'est pas du contenu protégé (Crunchyroll, Netflix, etc.)</p>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea id="description" class="form-input" rows="3" placeholder="Description optionnelle..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="video-file">Fichier vidéo *</label>
-                            <input type="file" id="video-file" class="form-input" accept="video/*" required>
-                            <small>Formats supportés: MP4, WebM, MOV (max 50MB)</small>
-                        </div>
-                        
-                        <div id="admin-import" style="display: none;">
-                            <button type="submit" class="btn btn-success btn-large">
-                                <i class="fas fa-upload"></i> Importer la vidéo
-                            </button>
-                        </div>
-                        
-                        <div id="non-admin-message" class="message error">
-                            <i class="fas fa-lock"></i> Seul l'administrateur peut importer des vidéos
-                        </div>
-                    </form>
+                    </div>
+                    
+                    <div id="copyright-result" style="margin: 20px 0;"></div>
+                    
+                    <div class="upload-buttons">
+                        <button id="step3-back" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                        <button id="submit-video" class="btn btn-success" disabled>
+                            <i class="fas fa-upload"></i> Publier la vidéo
+                        </button>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <p><i class="fas fa-exclamation-triangle"></i> <strong>Attention:</strong></p>
+                        <p>Les vidéos protégées par le droit d'auteur seront détectées et supprimées automatiquement.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mes Vidéos Section -->
+            <div id="my-videos-section" class="section">
+                <h2><i class="fas fa-film"></i> Mes vidéos</h2>
+                <div class="my-videos-grid" id="my-videos-grid">
+                    <p class="empty-message">Vous n'avez pas encore uploadé de vidéos.</p>
+                </div>
+            </div>
+            
+            <!-- Abonnements Section -->
+            <div id="subscriptions-section" class="section">
+                <h2><i class="fas fa-users"></i> Mes abonnements</h2>
+                <div class="subscriptions-list" id="subscriptions-list">
+                    <p class="empty-message">Vous n'êtes abonné à personne.</p>
+                </div>
+            </div>
+            
+            <!-- Tendances Section -->
+            <div id="trending-section" class="section">
+                <h2><i class="fas fa-chart-line"></i> Vidéos tendances</h2>
+                <div class="trending-grid" id="trending-grid">
+                    <p class="empty-message">Aucune vidéo tendance pour le moment.</p>
                 </div>
             </div>
         </div>
@@ -274,281 +305,93 @@
 
     <!-- Footer -->
     <footer>
-        <p>ANIMEREF © 2025 - Votre plateforme d'anime préférée</p>
-        <p>https://jitihn78o-arcl.github.io/ANIMEREF/</p>
+        <div class="footer-content">
+            <p>ANIMEREF © 2025 - Plateforme de streaming communautaire</p>
+            <p class="footer-links">
+                <a href="#">Conditions d'utilisation</a> • 
+                <a href="#">Politique de confidentialité</a> • 
+                <a href="#">Contact</a> • 
+                <a href="#">À propos</a>
+            </p>
+            <p class="footer-info">
+                📱 Dons: 07 09 65 63 59 • 📧 jitihh700@gmail.com
+            </p>
+        </div>
     </footer>
 
+    <!-- Modales -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('login-modal')">&times;</span>
+            <h3><i class="fas fa-sign-in-alt"></i> Connexion</h3>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
+                    <input type="text" id="login-username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('register-modal')">&times;</span>
+            <h3><i class="fas fa-user-plus"></i> Inscription</h3>
+            <form id="register-form">
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
+                    <input type="text" id="register-username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="register-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="register-password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirmer le mot de passe</label>
+                    <input type="password" id="register-confirm" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">Créer le compte</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="donate-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('donate-modal')">&times;</span>
+            <h3><i class="fas fa-heart"></i> Soutenir ANIMEREF</h3>
+            <p>Le site est entièrement gratuit. Les dons aident à son développement.</p>
+            
+            <div class="form-group">
+                <label>Montant (€)</label>
+                <input type="number" id="donate-amount" class="form-control" min="1" value="5">
+            </div>
+            
+            <div class="form-group">
+                <label>Méthode de paiement</label>
+                <select id="donate-method" class="form-control">
+                    <option value="mobile">Mobile Money (07 09 65 63 59)</option>
+                    <option value="paypal">PayPal (jitihh700@gmail.com)</option>
+                </select>
+            </div>
+            
+            <div class="donate-buttons">
+                <button id="confirm-donate" class="btn btn-success">
+                    <i class="fas fa-gift"></i> Confirmer le don
+                </button>
+                <button onclick="closeModal('donate-modal')" class="btn btn-secondary">Annuler</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
-    <!-- ==================== MODALES ==================== -->
-
-<!-- Modal Dons -->
-<div id="donate-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModals()">&times;</span>
-        <h3><i class="fas fa-heart"></i> Soutenir ANIMEREF</h3>
-        <p>Le site est entièrement gratuit. Si vous souhaitez soutenir le développement :</p>
-        
-        <div class="form-group">
-            <label>Montant (€)</label>
-            <input type="number" id="donate-amount" class="form-input" min="1" value="5" placeholder="10">
-        </div>
-        
-        <div class="form-group">
-            <label>Méthode de paiement</label>
-            <select id="donate-method" class="form-input">
-                <option value="mobile">📱 Mobile Money (07 09 65 63 59)</option>
-                <option value="paypal">💳 PayPal (jitihh700@gmail.com)</option>
-                <option value="crypto">₿ Crypto (Sur demande)</option>
-            </select>
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button id="confirm-donate" class="btn btn-success">
-                <i class="fas fa-gift"></i> Confirmer le don
-            </button>
-            <button onclick="closeModals()" class="btn btn-secondary">Annuler</button>
-        </div>
-        
-        <div style="margin-top: 20px; padding: 10px; background: rgba(244, 117, 33, 0.1); border-radius: 6px;">
-            <p><small><i class="fas fa-info-circle"></i> Les dons sont optionnels mais grandement appréciés !</small></p>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Login -->
-<div id="login-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModals()">&times;</span>
-        <h3><i class="fas fa-sign-in-alt"></i> Connexion</h3>
-        <form id="login-form">
-            <div class="form-group">
-                <label>Nom d'utilisateur</label>
-                <input type="text" id="login-username" class="form-input" required placeholder="Votre pseudo">
-            </div>
-            <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" id="login-password" class="form-input" required placeholder="Votre mot de passe">
-            </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> Se connecter
-            </button>
-            <button type="button" onclick="closeModals()" class="btn btn-secondary">Annuler</button>
-        </form>
-    </div>
-</div>
-
-<!-- ==================== MODALES D'AUTHENTIFICATION ==================== -->
-
-<!-- Modale Principale Auth -->
-<div id="auth-modal" class="modal">
-    <div class="modal-content auth-modal">
-        <span class="close" onclick="closeModal('auth-modal')">&times;</span>
-        
-        <div class="auth-header">
-            <div class="auth-logo">
-                <i class="fas fa-play-circle"></i>
-                <span>ANIMEREF</span>
-            </div>
-            <h2>Bienvenue !</h2>
-            <p>Connectez-vous pour uploader, commenter et vous abonner</p>
-        </div>
-        
-        <div class="auth-options">
-            <!-- Option Google -->
-            <button id="google-login" class="auth-btn google-btn">
-                <div class="auth-btn-icon">
-                    <i class="fab fa-google"></i>
-                </div>
-                <div class="auth-btn-text">
-                    <span class="auth-btn-title">Continuer avec Google</span>
-                    <span class="auth-btn-subtitle">Connexion rapide et sécurisée</span>
-                </div>
-                <div class="auth-btn-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </button>
-            
-            <!-- Option Email -->
-            <button id="email-login" class="auth-btn email-btn">
-                <div class="auth-btn-icon">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div class="auth-btn-text">
-                    <span class="auth-btn-title">Continuer avec Email</span>
-                    <span class="auth-btn-subtitle">Utilisez votre adresse email</span>
-                </div>
-                <div class="auth-btn-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </button>
-            
-            <div class="auth-divider">
-                <span class="divider-line"></span>
-                <span class="divider-text">ou</span>
-                <span class="divider-line"></span>
-            </div>
-            
-            <!-- Créer un compte -->
-            <button onclick="showModal('register-modal')" class="auth-btn create-btn">
-                <div class="auth-btn-icon">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <div class="auth-btn-text">
-                    <span class="auth-btn-title">Créer un compte</span>
-                    <span class="auth-btn-subtitle">C'est gratuit et rapide</span>
-                </div>
-            </button>
-        </div>
-        
-        <div class="auth-footer">
-            <p class="terms">
-                <small>En continuant, vous acceptez nos 
-                    <a href="#">Conditions d'utilisation</a> et 
-                    <a href="#">Politique de confidentialité</a>
-                </small>
-            </p>
-            <p class="guest-option">
-                <a href="#" onclick="closeModal('auth-modal')">Continuer en tant qu'invité</a>
-                <small>(fonctionnalités limitées)</small>
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- Modale Login Email -->
-<div id="login-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('login-modal')">&times;</span>
-        
-        <div class="modal-header">
-            <h3><i class="fas fa-sign-in-alt"></i> Connexion Email</h3>
-            <p>Entrez vos identifiants</p>
-        </div>
-        
-        <form id="login-form" class="auth-form">
-            <div class="form-group">
-                <label for="login-username">
-                    <i class="fas fa-user"></i> Nom d'utilisateur
-                </label>
-                <input type="text" id="login-username" class="form-input" 
-                       placeholder="Votre pseudo" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="login-password">
-                    <i class="fas fa-lock"></i> Mot de passe
-                </label>
-                <input type="password" id="login-password" class="form-input" 
-                       placeholder="Votre mot de passe" required>
-                <div class="password-options">
-                    <label class="remember-me">
-                        <input type="checkbox"> Se souvenir de moi
-                    </label>
-                    <a href="#" class="forgot-password">Mot de passe oublié ?</a>
-                </div>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-block btn-large">
-                <i class="fas fa-sign-in-alt"></i> Se connecter
-            </button>
-            
-            <div class="form-footer">
-                <p>Pas encore de compte ? 
-                    <a href="#" onclick="closeModal('login-modal'); showModal('register-modal')">
-                        S'inscrire
-                    </a>
-                </p>
-                <p>
-                    <a href="#" onclick="closeModal('login-modal'); showModal('auth-modal')">
-                        <i class="fas fa-arrow-left"></i> Retour aux options de connexion
-                    </a>
-                </p>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modale Register -->
-<div id="register-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('register-modal')">&times;</span>
-        
-        <div class="modal-header">
-            <h3><i class="fas fa-user-plus"></i> Créer un compte</h3>
-            <p>Rejoignez la communauté ANIMEREF</p>
-        </div>
-        
-        <form id="register-form" class="auth-form">
-            <div class="form-group">
-                <label for="register-username">
-                    <i class="fas fa-user"></i> Nom d'utilisateur *
-                </label>
-                <input type="text" id="register-username" class="form-input" 
-                       placeholder="Choisissez un pseudo unique" required>
-                <small class="form-help">Visible par tous les utilisateurs</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="register-email">
-                    <i class="fas fa-envelope"></i> Adresse email *
-                </label>
-                <input type="email" id="register-email" class="form-input" 
-                       placeholder="votre@email.com" required>
-                <small class="form-help">Nous ne partagerons jamais votre email</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="register-password">
-                    <i class="fas fa-lock"></i> Mot de passe *
-                </label>
-                <input type="password" id="register-password" class="form-input" 
-                       placeholder="Minimum 6 caractères" required>
-                <div class="password-strength">
-                    <div class="strength-bar"></div>
-                    <small>Force du mot de passe</small>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="register-confirm">
-                    <i class="fas fa-lock"></i> Confirmer le mot de passe *
-                </label>
-                <input type="password" id="register-confirm" class="form-input" 
-                       placeholder="Retapez votre mot de passe" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" required>
-                    J'accepte les <a href="#">Conditions d'utilisation</a> et la 
-                    <a href="#">Politique de confidentialité</a>
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label class="checkbox-label">
-                    <input type="checkbox">
-                    Je souhaite recevoir les nouveautés et recommandations (optionnel)
-                </label>
-            </div>
-            
-            <button type="submit" class="btn btn-success btn-block btn-large">
-                <i class="fas fa-user-plus"></i> Créer mon compte
-            </button>
-            
-            <div class="form-footer">
-                <p>Déjà un compte ? 
-                    <a href="#" onclick="closeModal('register-modal'); showModal('login-modal')">
-                        Se connecter
-                    </a>
-                </p>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ==================== FIN DES MODALES ==================== -->
 </body>
 </html>
-<meta name="description" content="ANIMEREF - Plateforme de streaming d'anime gratuite. Regardez des animes, importez vos vidéos, commentez et likez.">
-<meta name="keywords" content="anime, streaming, ANIMEREF, regarder anime, anime gratuit">
