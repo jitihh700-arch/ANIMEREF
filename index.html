@@ -3,395 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIMEREF - Votre plateforme d'anime</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Ma Bibliothèque Vidéo - Style Crunchyroll</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
 </head>
 <body>
-    <!-- Header -->
+
+    <!-- Header / Navigation -->
     <header>
-        <div class="logo">
-            <i class="fas fa-play-circle"></i>
-            <span>ANIMEREF</span>
-        </div>
-        
+        <div class="logo">MYVIDEO</div>
         <nav>
-            <ul>
-                <li><a href="#" id="nav-home" class="nav-link active"><i class="fas fa-home"></i> Accueil</a></li>
-                <li><a href="#" id="nav-history" class="nav-link"><i class="fas fa-history"></i> Historique</a></li>
-                <li><a href="#" id="nav-library" class="nav-link"><i class="fas fa-film"></i> Bibliothèque</a></li>
-                <li><a href="#" id="nav-upload" class="nav-link"><i class="fas fa-upload"></i> Importer</a></li>
-            </ul>
+            <a href="#">Accueil</a>
+            <a href="#">Bibliothèque</a>
+            <a href="#">Historique</a>
+            <a href="#">Import</a>
+            <a href="#">Paramètres</a>
         </nav>
-        
-        <div class="header-right">
-            <div id="auth-section">
-                <button id="login-btn" class="btn btn-secondary">Connexion</button>
-                <button id="register-btn" class="btn btn-primary">Inscription</button>
-            </div>
-            
-            <div id="user-section" style="display: none;">
-                <span id="username-display"></span>
-                <button id="logout-btn" class="btn btn-secondary">Déconnexion</button>
-            </div>
-            
-            <button id="donate-btn" class="btn btn-warning">
-                <i class="fas fa-heart"></i> Dons
-            </button>
+        <div class="user-section">
+            <span>Utilisateur</span>
+            <button class="btn">Connexion</button>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Sidebar -->
+    <!-- Contenu Principal -->
+    <div class="container">
+
+        <!-- Section : Recommandations / À la une -->
+        <h2 class="section-title">À ne pas manquer</h2>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-thumbnail"></div>
+                <div class="video-info">
+                    <div class="video-title">Anime Action Saison 2</div>
+                    <div class="video-meta">Épisode 12 • 24 min</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-thumbnail"></div>
+                <div class="video-info">
+                    <div class="video-title">Drame Romantique</div>
+                    <div class="video-meta">Épisode 8 • 22 min</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-thumbnail"></div>
+                <div class="video-info">
+                    <div class="video-title">Aventure Fantastique</div>
+                    <div class="video-meta">Épisode 15 • 26 min</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-thumbnail"></div>
+                <div class="video-info">
+                    <div class="video-title">Comédie Quotidienne</div>
+                    <div class="video-meta">Épisode 5 • 20 min</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section : Ma Bibliothèque -->
+        <h2 class="section-title">Ma Bibliothèque</h2>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-thumbnail"></div>
+                <div class="video-info">
+                    <div class="video-title">ask for one final thing</div>
+                    <div class="video-meta">Par Utilisateur • 10 min</div>
+                </div>
+            </div>
+            <!-- Tu peux ajouter d'autres vidéos ici -->
+        </div>
+
+        <!-- Sidebar : Historique & Import -->
         <div class="sidebar">
-            <div class="sidebar-section">
-                <h3><i class="fas fa-fire"></i> Tendance</h3>
-                <a href="#" class="sidebar-item active" data-section="home">
-                    <i class="fas fa-play"></i> Vidéo en cours
-                </a>
-                <a href="#" class="sidebar-item" data-section="trending">
-                    <i class="fas fa-chart-line"></i> Vidéos populaires
-                </a>
-            </div>
-            
-            <div class="sidebar-section">
-                <h3><i class="fas fa-user"></i> Mon Compte</h3>
-                <div class="sidebar-item" id="admin-toggle">
-                    <i class="fas fa-crown"></i> <span id="admin-text">Mode Admin</span>
-                </div>
-                <div class="sidebar-item" id="my-videos-btn">
-                    <i class="fas fa-film"></i> Mes vidéos
-                </div>
-                <div class="sidebar-item" id="subscriptions-btn">
-                    <i class="fas fa-users"></i> Mes abonnements
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h3><i class="fas fa-cog"></i> Paramètres</h3>
-                <div class="sidebar-item" id="clear-history-btn">
-                    <i class="fas fa-trash"></i> Vider l'historique
-                </div>
-            </div>
-            
-            <div class="sidebar-footer">
-                <button id="sidebar-donate" class="btn btn-warning btn-block">
-                    <i class="fas fa-heart"></i> Soutenir le projet
-                </button>
-                <p class="donate-note">
-                    <small>Les dons aident à garder le site gratuit</small>
-                </p>
-            </div>
+            <h3>Historique de visionnage</h3>
+            <p>Ancune vidéo visionnée récemment.</p>
+            <h3>Importer une vidéo</h3>
+            <p>Sélectionnez un fichier vidéo depuis votre appareil.</p>
+            <button class="btn">Choisir un fichier</button>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #ccc;">Formats supportés : MP4, MOV, AVI</p>
         </div>
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Accueil Section -->
-            <div id="home-section" class="section active">
-                <div class="video-container">
-                    <div class="video-header">
-                        <h2 id="current-video-title">Aucune vidéo sélectionnée</h2>
-                        <div class="video-meta">
-                            <span id="video-views"><i class="fas fa-eye"></i> 0 vues</span>
-                            <span id="video-date">-</span>
-                        </div>
-                    </div>
-                    
-                    <div class="video-player">
-                        <div id="no-video" class="no-video">
-                            <i class="fas fa-film"></i>
-                            <p>Sélectionnez une vidéo dans la bibliothèque</p>
-                        </div>
-                        <video id="video-element" controls style="display: none;">
-                            Votre navigateur ne supporte pas les vidéos.
-                        </video>
-                    </div>
-                    
-                    <div class="video-controls">
-                        <div class="video-actions">
-                            <button id="play-btn" class="btn btn-primary">
-                                <i class="fas fa-play"></i> Lire
-                            </button>
-                            <button id="pause-btn" class="btn btn-secondary">
-                                <i class="fas fa-pause"></i> Pause
-                            </button>
-                            <button id="like-btn" class="btn-like">
-                                <i class="far fa-heart"></i> <span id="like-count">0</span>
-                            </button>
-                            <button id="subscribe-btn" class="btn btn-primary" style="display: none;">
-                                <i class="fas fa-user-plus"></i> S'abonner
-                            </button>
-                            <button id="delete-video-btn" class="btn btn-danger" style="display: none;">
-                                <i class="fas fa-trash"></i> Supprimer
-                            </button>
-                        </div>
-                        
-                        <div class="video-author">
-                            Par <span id="video-author">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Commentaires -->
-                <div class="comments-section">
-                    <h3><i class="fas fa-comments"></i> Commentaires</h3>
-                    <div class="comment-form">
-                        <input type="text" id="comment-input" placeholder="Écrire un commentaire..." class="comment-input">
-                        <button id="submit-comment" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Publier
-                        </button>
-                    </div>
-                    <div id="comments-list" class="comments-list">
-                        <p class="empty-message">Aucun commentaire. Soyez le premier !</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Historique Section -->
-            <div id="history-section" class="section">
-                <h2><i class="fas fa-history"></i> Historique de visionnage</h2>
-                <div class="history-list" id="history-list">
-                    <p class="empty-message">Aucune vidéo visionnée.</p>
-                </div>
-            </div>
-
-            <!-- Bibliothèque Section -->
-            <div id="library-section" class="section">
-                <div class="library-header">
-                    <h2><i class="fas fa-film"></i> Bibliothèque</h2>
-                    <div class="library-search">
-                        <input type="text" id="search-input" placeholder="Rechercher une vidéo...">
-                        <button id="search-btn" class="btn btn-secondary">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="admin-controls" style="display: none; margin-bottom: 20px;">
-                    <button id="delete-selected-btn" class="btn btn-danger">
-                        <i class="fas fa-trash"></i> Supprimer la sélection
-                    </button>
-                </div>
-                
-                <div class="library-grid" id="library-grid">
-                    <p class="empty-message">Aucune vidéo importée.</p>
-                </div>
-            </div>
-
-            <!-- Importer Section -->
-            <div id="upload-section" class="section">
-                <h2><i class="fas fa-upload"></i> Importer une vidéo</h2>
-                
-                <div class="upload-steps">
-                    <div class="step-indicator active">
-                        <div class="step-number">1</div>
-                        <div class="step-label">Fichier</div>
-                    </div>
-                    <div class="step-indicator">
-                        <div class="step-number">2</div>
-                        <div class="step-label">Infos</div>
-                    </div>
-                    <div class="step-indicator">
-                        <div class="step-number">3</div>
-                        <div class="step-label">Vérification</div>
-                    </div>
-                </div>
-                
-                <!-- Étape 1: Sélection du fichier -->
-                <div id="step1" class="upload-step">
-                    <h4><i class="fas fa-file-video"></i> Sélectionnez votre vidéo</h4>
-                    <div class="form-group">
-                        <input type="file" id="video-file" class="form-control" accept="video/*" required>
-                        <small>Formats supportés: MP4, WebM, MOV</small>
-                    </div>
-                    
-                    <div id="file-info" style="display: none; margin-top: 20px; padding: 15px; background: rgba(244, 117, 33, 0.1); border-radius: 8px;">
-                        <p><strong>Fichier sélectionné:</strong> <span id="file-name"></span></p>
-                        <p><strong>Taille:</strong> <span id="file-size"></span></p>
-                    </div>
-                    
-                    <div class="upload-buttons">
-                        <button id="step1-next" class="btn btn-primary" disabled>
-                            Suivant <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Étape 2: Informations -->
-                <div id="step2" class="upload-step" style="display: none;">
-                    <h4><i class="fas fa-info-circle"></i> Informations sur la vidéo</h4>
-                    
-                    <div class="form-group">
-                        <label for="video-title">Titre de la vidéo *</label>
-                        <input type="text" id="video-title" class="form-control" placeholder="Titre original" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="video-description">Description</label>
-                        <textarea id="video-description" class="form-control" rows="3" placeholder="Décrivez votre vidéo..."></textarea>
-                    </div>
-                    
-                    <div class="upload-buttons">
-                        <button id="step2-back" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Retour
-                        </button>
-                        <button id="step2-next" class="btn btn-primary">
-                            Suivant <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Étape 3: Vérification -->
-                <div id="step3" class="upload-step" style="display: none;">
-                    <h4><i class="fas fa-shield-alt"></i> Vérification du contenu</h4>
-                    
-                    <div id="copyright-check" class="copyright-checkbox">
-                        <label>
-                            <input type="checkbox" id="copyright-agree" required>
-                            Je certifie que cette vidéo est ma création originale
-                        </label>
-                        <div class="copyright-list">
-                            <p>• Je ne viole aucun droit d'auteur</p>
-                            <p>• Je suis le propriétaire du contenu</p>
-                            <p>• Ce n'est pas du contenu protégé (Crunchyroll, Netflix, etc.)</p>
-                        </div>
-                    </div>
-                    
-                    <div id="copyright-result" style="margin: 20px 0;"></div>
-                    
-                    <div class="upload-buttons">
-                        <button id="step3-back" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Retour
-                        </button>
-                        <button id="submit-video" class="btn btn-success" disabled>
-                            <i class="fas fa-upload"></i> Publier la vidéo
-                        </button>
-                    </div>
-                    
-                    <div class="warning-box">
-                        <p><i class="fas fa-exclamation-triangle"></i> <strong>Attention:</strong></p>
-                        <p>Les vidéos protégées par le droit d'auteur seront détectées et supprimées automatiquement.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Mes Vidéos Section -->
-            <div id="my-videos-section" class="section">
-                <h2><i class="fas fa-film"></i> Mes vidéos</h2>
-                <div class="my-videos-grid" id="my-videos-grid">
-                    <p class="empty-message">Vous n'avez pas encore uploadé de vidéos.</p>
-                </div>
-            </div>
-            
-            <!-- Abonnements Section -->
-            <div id="subscriptions-section" class="section">
-                <h2><i class="fas fa-users"></i> Mes abonnements</h2>
-                <div class="subscriptions-list" id="subscriptions-list">
-                    <p class="empty-message">Vous n'êtes abonné à personne.</p>
-                </div>
-            </div>
-            
-            <!-- Tendances Section -->
-            <div id="trending-section" class="section">
-                <h2><i class="fas fa-chart-line"></i> Vidéos tendances</h2>
-                <div class="trending-grid" id="trending-grid">
-                    <p class="empty-message">Aucune vidéo tendance pour le moment.</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <p>ANIMEREF © 2025 - Plateforme de streaming communautaire</p>
-            <p class="footer-links">
-                <a href="#">Conditions d'utilisation</a> • 
-                <a href="#">Politique de confidentialité</a> • 
-                <a href="#">Contact</a> • 
-                <a href="#">À propos</a>
-            </p>
-            <p class="footer-info">
-                📱 Dons: 07 09 65 63 59 • 📧 jitihh700@gmail.com
-            </p>
-        </div>
+        <p>© 2023 MYVIDEO - Tous droits réservés. Design inspiré de Crunchyroll.</p>
     </footer>
 
-    <!-- Modales -->
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('login-modal')">&times;</span>
-            <h3><i class="fas fa-sign-in-alt"></i> Connexion</h3>
-            <form id="login-form">
-                <div class="form-group">
-                    <label>Nom d'utilisateur</label>
-                    <input type="text" id="login-username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Mot de passe</label>
-                    <input type="password" id="login-password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="register-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('register-modal')">&times;</span>
-            <h3><i class="fas fa-user-plus"></i> Inscription</h3>
-            <form id="register-form">
-                <div class="form-group">
-                    <label>Nom d'utilisateur</label>
-                    <input type="text" id="register-username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="register-email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Mot de passe</label>
-                    <input type="password" id="register-password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Confirmer le mot de passe</label>
-                    <input type="password" id="register-confirm" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-success btn-block">Créer le compte</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="donate-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('donate-modal')">&times;</span>
-            <h3><i class="fas fa-heart"></i> Soutenir ANIMEREF</h3>
-            <p>Le site est entièrement gratuit. Les dons aident à son développement.</p>
-            
-            <div class="form-group">
-                <label>Montant (€)</label>
-                <input type="number" id="donate-amount" class="form-control" min="1" value="5">
-            </div>
-            
-            <div class="form-group">
-                <label>Méthode de paiement</label>
-                <select id="donate-method" class="form-control">
-                    <option value="mobile">Mobile Money (07 09 65 63 59)</option>
-                    <option value="paypal">PayPal (jitihh700@gmail.com)</option>
-                </select>
-            </div>
-            
-            <div class="donate-buttons">
-                <button id="confirm-donate" class="btn btn-success">
-                    <i class="fas fa-gift"></i> Confirmer le don
-                </button>
-                <button onclick="closeModal('donate-modal')" class="btn btn-secondary">Annuler</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
