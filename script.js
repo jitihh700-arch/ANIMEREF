@@ -1,148 +1,110 @@
-// === BASE DE DONNÉES SIMULÉE ===
+// === VARIABLES GLOBALES ===
 let videos = [];
 let users = [];
 let currentUser = null;
 let watchHistory = [];
-let myVideos = [];
-let uploadStep = 1;
-let selectedFile = null;
-let currentPlayingVideo = null;
 
 // === INITIALISATION ===
 document.addEventListener('DOMContentLoaded', function() {
-    initData();
+    // Charger les données
+    loadData();
+    
+    // Afficher interface vide
     loadVideos();
-    loadWatchHistory();
-    loadMyVideos();
-    checkAuthStatus();
-    setupEventListeners();
-    showNotification("Animeref chargé avec succès!");
+    
+    // Attacher tous les événements
+    attachEvents();
+    
+    // Afficher notification de démarrage
+    showNotification("Animeref prêt !");
 });
 
-// === DONNÉES INITIALES ===
-function initData() {
+// === CHARGEMENT DES DONNÉES ===
+function loadData() {
     // Charger depuis localStorage
     const savedVideos = localStorage.getItem('animeref_videos');
     const savedUsers = localStorage.getItem('animeref_users');
     const savedHistory = localStorage.getItem('animeref_history');
-    const savedMyVideos = localStorage.getItem('animeref_myvideos');
     const savedUser = localStorage.getItem('animeref_currentUser');
     
     if (savedVideos) videos = JSON.parse(savedVideos);
     if (savedUsers) users = JSON.parse(savedUsers);
     if (savedHistory) watchHistory = JSON.parse(savedHistory);
-    if (savedMyVideos) myVideos = JSON.parse(savedMyVideos);
     if (savedUser) currentUser = JSON.parse(savedUser);
     
-    // Données d'exemple si vide
+    // Aucune vidéo par défaut - interface vide
     if (videos.length === 0) {
-        videos = [
-            {
-                id: 1,
-                title: "Naruto Shippuden",
-                episode: 3,
-                description: "Naruto commence son entraînement avec Jiraya",
-                channel: "AnimeFan",
-                views: "150K",
-                date: "Il y a 3 jours",
-                duration: "23:45",
-                thumbnail: "https://picsum.photos/320/180?random=1",
-                videoUrl: null,
-                userId: 2,
-                likes: 1200,
-                dislikes: 15,
-                visibility: "public"
-            },
-            {
-                id: 2,
-                title: "One Piece",
-                episode: 1024,
-                description: "Luffy vs Kaido - La bataille finale",
-                channel: "Équipe OP",
-                views: "890K",
-                date: "Il y a 1 semaine",
-                duration: "24:30",
-                thumbnail: "https://picsum.photos/320/180?random=2",
-                videoUrl: null,
-                userId: 3,
-                likes: 8900,
-                dislikes: 45,
-                visibility: "public"
-            }
-        ];
-        saveToLocalStorage('animeref_videos', videos);
+        // Interface vide comme demandé
     }
     
+    // Utilisateur admin par défaut
     if (users.length === 0) {
         users = [
-            { id: 1, name: "Admin", email: "admin@animeref.com", password: "admin123" },
-            { id: 2, name: "AnimeFan", email: "fan@exemple.com", password: "fan123" },
-            { id: 3, name: "Équipe OP", email: "op@exemple.com", password: "op123" }
+            {
+                id: 1,
+                name: "Admin",
+                email: "admin@animeref.com",
+                password: "admin123"
+            }
         ];
-        saveToLocalStorage('animeref_users', users);
+        localStorage.setItem('animeref_users', JSON.stringify(users));
     }
+    
+    // Mettre à jour l'interface utilisateur
+    updateAuthUI();
 }
 
-// === ÉCOUTEURS D'ÉVÉNEMENTS ===
-function setupEventListeners() {
-    // Sidebar
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const section = item.getAttribute('data-section');
-            showSection(section);
-        });
-    });
-    
+// === ATTACHER ÉVÉNEMENTS ===
+function attachEvents() {
     // Navigation
-    document.getElementById('uploadBtn').addEventListener('click', openUploadModal);
-    document.getElementById('signInBtn').addEventListener('click', openAuthModal);
-    document.getElementById('donateBtn').addEventListener('click', openDonateModal);
-    document.getElementById('uploadFromMyVideos').addEventListener('click', openUploadModal);
-    document.getElementById('searchBtn').addEventListener('click', searchVideos);
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') searchVideos();
-    });
+    document.getElementById('uploadBtn').onclick = openUploadModal;
+    document.getElementById('signInBtn').onclick = openAuthModal;
+    document.getElementById('donateBtn').onclick = openDonateModal;
+    document.getElementById('searchBtn').onclick = searchVideos;
     
-    // Modals fermeture
-    document.getElementById('closeVideoModal').addEventListener('click', closeVideoModal);
-    document.getElementById('closeUploadModal').addEventListener('click', closeUploadModal);
-    document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
-    document.getElementById('closeDonateModal').addEventListener('click', closeDonateModal);
+    // Fermeture modals
+    document.getElementById('closeVideoModal').onclick = closeVideoModal;
+    document.getElementById('closeUploadModal').onclick = closeUploadModal;
+    document.getElementById('closeAuthModal').onclick = closeAuthModal;
+    document.getElementById('closeDonateModal').onclick = closeDonateModal;
     
-    // Upload modal
-    document.getElementById('fileUploadArea').addEventListener('click', () => {
-        document.getElementById('videoFile').click();
-    });
-    document.getElementById('videoFile').addEventListener('change', handleFileSelect);
-    document.getElementById('nextStep1').addEventListener('click', () => nextUploadStep(2));
-    document.getElementById('prevStep2').addEventListener('click', () => prevUploadStep(1));
-    document.getElementById('nextStep2').addEventListener('click', () => nextUploadStep(3));
-    document.getElementById('prevStep3').addEventListener('click', () => prevUploadStep(2));
-    document.getElementById('submitVideoBtn').addEventListener('click', submitVideo);
+    // Auth
+    document.getElementById('loginBtn').onclick = login;
+    document.getElementById('signupBtn').onclick = signup;
+    document.getElementById('showSignup').onclick = showSignupForm;
+    document.getElementById('showLogin').onclick = showLoginForm;
     
-    // Auth modal
-    document.getElementById('loginTab').addEventListener('click', () => switchAuthTab('login'));
-    document.getElementById('signupTab').addEventListener('click', () => switchAuthTab('signup'));
-    document.getElementById('loginBtn').addEventListener('click', login);
-    document.getElementById('signupBtn').addEventListener('click', signup);
+    // Upload
+    document.getElementById('submitVideoBtn').onclick = uploadVideo;
     
-    // Donate modal
-    document.querySelectorAll('.donation-amount').forEach(btn => {
-        btn.addEventListener('click', function() {
+    // Dons
+    document.querySelectorAll('.amount-btn').forEach(btn => {
+        btn.onclick = function() {
             const amount = this.getAttribute('data-amount');
             selectDonationAmount(amount);
-        });
+        };
     });
-    document.getElementById('processPaymentBtn').addEventListener('click', processPayment);
+    document.getElementById('customDonateBtn').onclick = processDonation;
     
-    // Video modal actions
-    document.getElementById('likeBtn').addEventListener('click', likeVideo);
-    document.getElementById('dislikeBtn').addEventListener('click', dislikeVideo);
-    document.getElementById('shareBtn').addEventListener('click', shareVideo);
-    document.getElementById('deleteVideoBtn').addEventListener('click', deleteVideo);
+    // Actions vidéo
+    document.getElementById('likeBtn').onclick = likeVideo;
+    document.getElementById('deleteBtn').onclick = deleteVideo;
+    
+    // Sidebar
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.onclick = function() {
+            const section = this.getAttribute('data-section');
+            showSection(section);
+        };
+    });
+    
+    // Recherche par Enter
+    document.getElementById('searchInput').onkeypress = function(e) {
+        if (e.key === 'Enter') searchVideos();
+    };
     
     // Fermer modals en cliquant à l'extérieur
-    window.addEventListener('click', (event) => {
+    window.onclick = function(event) {
         const modals = ['videoModal', 'uploadModal', 'authModal', 'donateModal'];
         modals.forEach(modalId => {
             const modal = document.getElementById(modalId);
@@ -153,69 +115,77 @@ function setupEventListeners() {
                 if (modalId === 'donateModal') closeDonateModal();
             }
         });
-    });
+    };
 }
 
-// === VIDÉOS ===
+// === GESTION DES VIDÉOS ===
 function loadVideos() {
-    const sections = ['homeVideos', 'trendingVideos', 'animeListVideos'];
+    const sections = ['homeVideos', 'trendingVideos'];
     
     sections.forEach(sectionId => {
-        const grid = document.getElementById(sectionId);
-        if (!grid) return;
+        const container = document.getElementById(sectionId);
+        if (!container) return;
         
-        grid.innerHTML = '';
+        container.innerHTML = '';
         
-        const publicVideos = videos.filter(v => v.visibility === "public");
+        // Afficher seulement les vidéos publiques
+        const publicVideos = videos.filter(v => v.visibility === 'public');
         
         if (publicVideos.length === 0) {
-            grid.innerHTML = '<p class="empty-state">Aucun anime disponible</p>';
+            container.innerHTML = '<p class="empty-state">Aucune vidéo disponible</p>';
             return;
         }
         
         publicVideos.forEach(video => {
             const card = createVideoCard(video);
-            grid.appendChild(card);
+            container.appendChild(card);
         });
     });
+    
+    // Charger mes vidéos
+    loadMyVideos();
 }
 
 function createVideoCard(video) {
     const div = document.createElement('div');
     div.className = 'video-card';
+    
     div.innerHTML = `
         <div class="video-thumbnail">
-            <img src="${video.thumbnail}" alt="${video.title}">
-            <div class="video-duration">${video.duration}</div>
+            ${video.thumbnail ? `<img src="${video.thumbnail}" alt="${video.title}">` : ''}
         </div>
         <div class="video-info">
-            <h3 class="video-title">${video.title} ${video.episode ? '- Épisode ' + video.episode : ''}</h3>
-            <p class="video-meta">${video.channel} • ${video.views} vues • ${video.date}</p>
+            <h3>${video.title}</h3>
+            <p>${video.channel} • ${video.views || '0'} vues</p>
         </div>
     `;
     
-    div.addEventListener('click', () => openVideoModal(video));
+    div.onclick = function() {
+        playVideo(video);
+    };
+    
     return div;
 }
 
-function openVideoModal(video) {
-    currentPlayingVideo = video;
+function playVideo(video) {
     const modal = document.getElementById('videoModal');
     
     // Mettre à jour les infos
-    document.getElementById('videoModalTitle').textContent = `${video.title} ${video.episode ? '- Épisode ' + video.episode : ''}`;
-    document.getElementById('videoModalViews').textContent = `${video.views} vues`;
-    document.getElementById('videoModalDate').textContent = video.date;
-    document.getElementById('videoModalEpisode').textContent = video.episode ? `Épisode ${video.episode}` : '';
-    document.getElementById('videoModalDescription').textContent = video.description;
-    document.getElementById('videoModalChannel').textContent = video.channel;
-    document.getElementById('likeCount').textContent = video.likes || 0;
-    document.getElementById('dislikeCount').textContent = video.dislikes || 0;
+    document.getElementById('videoTitle').textContent = video.title;
+    document.getElementById('videoDescription').textContent = video.description || '';
     
-    // Afficher bouton supprimer si c'est notre vidéo
-    const deleteBtn = document.getElementById('deleteVideoBtn');
+    // Configurer la vidéo
+    const player = document.getElementById('videoPlayer');
+    if (video.videoData) {
+        player.src = video.videoData;
+    } else if (video.videoUrl) {
+        player.src = video.videoUrl;
+    }
+    
+    // Bouton supprimer
+    const deleteBtn = document.getElementById('deleteBtn');
     if (currentUser && video.userId === currentUser.id) {
-        deleteBtn.style.display = 'flex';
+        deleteBtn.style.display = 'block';
     } else {
         deleteBtn.style.display = 'none';
     }
@@ -223,23 +193,310 @@ function openVideoModal(video) {
     // Ajouter à l'historique
     addToHistory(video);
     
-    // Afficher modal
+    // Afficher le modal
     modal.style.display = 'flex';
 }
 
 function closeVideoModal() {
     const modal = document.getElementById('videoModal');
     const player = document.getElementById('videoPlayer');
-    if (player) player.pause();
+    
+    if (player) {
+        player.pause();
+        player.src = '';
+    }
+    
     modal.style.display = 'none';
-    currentPlayingVideo = null;
+}
+
+// === UPLOAD DE VIDÉO ===
+function openUploadModal() {
+    if (!currentUser) {
+        showNotification("Connectez-vous pour publier");
+        openAuthModal();
+        return;
+    }
+    
+    document.getElementById('uploadModal').style.display = 'flex';
+}
+
+function closeUploadModal() {
+    document.getElementById('uploadModal').style.display = 'none';
+}
+
+function uploadVideo() {
+    const title = document.getElementById('videoTitleInput').value;
+    const description = document.getElementById('videoDescriptionInput').value;
+    const fileInput = document.getElementById('videoFileInput');
+    
+    if (!title) {
+        showNotification("Le titre est requis");
+        return;
+    }
+    
+    if (!fileInput.files[0]) {
+        showNotification("Sélectionnez un fichier vidéo");
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    // Lire le fichier
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Créer la nouvelle vidéo
+        const newVideo = {
+            id: Date.now(),
+            title: title,
+            description: description,
+            channel: currentUser.name,
+            views: "0",
+            date: new Date().toLocaleDateString('fr-FR'),
+            thumbnail: null,
+            videoData: e.target.result,
+            userId: currentUser.id,
+            likes: 0,
+            visibility: "public"
+        };
+        
+        // Ajouter aux vidéos
+        videos.unshift(newVideo);
+        
+        // Sauvegarder
+        localStorage.setItem('animeref_videos', JSON.stringify(videos));
+        
+        // Mettre à jour l'interface
+        loadVideos();
+        
+        // Fermer et notifier
+        closeUploadModal();
+        showNotification("Vidéo publiée avec succès !");
+        
+        // Réinitialiser le formulaire
+        document.getElementById('videoTitleInput').value = '';
+        document.getElementById('videoDescriptionInput').value = '';
+        document.getElementById('videoFileInput').value = '';
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// === AUTHENTIFICATION ===
+function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+    showLoginForm();
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+}
+
+function showLoginForm() {
+    document.querySelector('.auth-form').style.display = 'block';
+    document.querySelector('.signup-form').style.display = 'none';
+}
+
+function showSignupForm() {
+    document.querySelector('.auth-form').style.display = 'none';
+    document.querySelector('.signup-form').style.display = 'block';
+}
+
+function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showNotification("Email et mot de passe requis");
+        return;
+    }
+    
+    // Chercher l'utilisateur
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (!user) {
+        showNotification("Email ou mot de passe incorrect");
+        return;
+    }
+    
+    // Connecter
+    currentUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email
+    };
+    
+    localStorage.setItem('animeref_currentUser', JSON.stringify(currentUser));
+    
+    // Mettre à jour l'interface
+    updateAuthUI();
+    
+    // Fermer modal
+    closeAuthModal();
+    
+    // Notifier
+    showNotification(`Bienvenue ${currentUser.name} !`);
+    
+    // Recharger les vidéos
+    loadVideos();
+}
+
+function signup() {
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    
+    if (!name || !email || !password) {
+        showNotification("Tous les champs sont requis");
+        return;
+    }
+    
+    // Vérifier si l'email existe déjà
+    if (users.some(u => u.email === email)) {
+        showNotification("Cet email est déjà utilisé");
+        return;
+    }
+    
+    // Créer nouvel utilisateur
+    const newUser = {
+        id: Date.now(),
+        name: name,
+        email: email,
+        password: password
+    };
+    
+    users.push(newUser);
+    currentUser = {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email
+    };
+    
+    // Sauvegarder
+    localStorage.setItem('animeref_users', JSON.stringify(users));
+    localStorage.setItem('animeref_currentUser', JSON.stringify(currentUser));
+    
+    // Mettre à jour l'interface
+    updateAuthUI();
+    
+    // Fermer modal
+    closeAuthModal();
+    
+    // Notifier
+    showNotification(`Compte créé avec succès ! Bienvenue ${currentUser.name}`);
+    
+    // Recharger les vidéos
+    loadVideos();
+}
+
+function updateAuthUI() {
+    const signInBtn = document.getElementById('signInBtn');
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    
+    if (currentUser) {
+        signInBtn.style.display = 'none';
+        userProfileBtn.style.display = 'inline-block';
+        document.getElementById('userName').textContent = currentUser.name;
+        
+        // Menu profil
+        userProfileBtn.onclick = function(e) {
+            e.stopPropagation();
+            
+            const menu = document.createElement('div');
+            menu.style.cssText = `
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #1a1a1a;
+                border: 1px solid #333;
+                padding: 10px 0;
+                border-radius: 4px;
+                min-width: 150px;
+                z-index: 1000;
+            `;
+            
+            menu.innerHTML = `
+                <div style="padding: 10px 20px; color: white; cursor: pointer;" onclick="showSection('my-videos')">
+                    Mes vidéos
+                </div>
+                <div style="padding: 10px 20px; color: #ff4757; cursor: pointer; border-top: 1px solid #333;" onclick="logout()">
+                    Déconnexion
+                </div>
+            `;
+            
+            document.body.appendChild(menu);
+            
+            // Fermer en cliquant ailleurs
+            setTimeout(() => {
+                const closeMenu = function(e) {
+                    if (!menu.contains(e.target) && e.target !== userProfileBtn) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                };
+                document.addEventListener('click', closeMenu);
+            }, 0);
+        };
+    } else {
+        signInBtn.style.display = 'inline-block';
+        userProfileBtn.style.display = 'none';
+    }
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('animeref_currentUser');
+    updateAuthUI();
+    showNotification("Déconnecté");
+    loadVideos();
+}
+
+// === MES VIDÉOS ===
+function loadMyVideos() {
+    const container = document.getElementById('myVideosList');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (!currentUser) {
+        container.innerHTML = '<p class="empty-state">Connectez-vous pour voir vos vidéos</p>';
+        return;
+    }
+    
+    const userVideos = videos.filter(v => v.userId === currentUser.id);
+    
+    if (userVideos.length === 0) {
+        container.innerHTML = '<p class="empty-state">Vous n\'avez pas encore publié de vidéos</p>';
+        return;
+    }
+    
+    userVideos.forEach(video => {
+        const div = document.createElement('div');
+        div.className = 'video-card';
+        
+        div.innerHTML = `
+            <div class="video-thumbnail">
+                ${video.thumbnail ? `<img src="${video.thumbnail}" alt="${video.title}">` : ''}
+            </div>
+            <div class="video-info">
+                <h3>${video.title}</h3>
+                <p>${video.views || '0'} vues • ${video.date}</p>
+            </div>
+        `;
+        
+        div.onclick = function() {
+            playVideo(video);
+        };
+        
+        container.appendChild(div);
+    });
 }
 
 // === HISTORIQUE ===
 function addToHistory(video) {
     if (!currentUser) return;
     
-    const historyItem = {
+    // Créer l'entrée d'historique
+    const historyEntry = {
         ...video,
         watchedAt: new Date().toLocaleString('fr-FR')
     };
@@ -250,449 +507,52 @@ function addToHistory(video) {
         watchHistory.splice(existingIndex, 1);
     }
     
-    watchHistory.unshift(historyItem);
+    // Ajouter au début
+    watchHistory.unshift(historyEntry);
     
-    // Limiter à 50
-    if (watchHistory.length > 50) watchHistory.pop();
+    // Limiter à 50 entrées
+    if (watchHistory.length > 50) {
+        watchHistory.pop();
+    }
     
-    saveToLocalStorage('animeref_history', watchHistory);
-    loadWatchHistory();
+    // Sauvegarder
+    localStorage.setItem('animeref_history', JSON.stringify(watchHistory));
+    
+    // Mettre à jour l'affichage si on est sur la page historique
+    if (document.getElementById('history').classList.contains('active')) {
+        showHistory();
+    }
 }
 
-function loadWatchHistory() {
-    const list = document.getElementById('historyList');
-    if (!list) return;
+function showHistory() {
+    const container = document.getElementById('historyList');
+    if (!container) return;
     
-    list.innerHTML = '';
+    container.innerHTML = '';
     
     if (watchHistory.length === 0) {
-        list.innerHTML = '<p class="empty-state">Aucune vidéo visionnée</p>';
+        container.innerHTML = '<p class="empty-state">Aucune vidéo visionnée</p>';
         return;
     }
     
     watchHistory.forEach(item => {
         const div = document.createElement('div');
         div.className = 'history-item';
+        
         div.innerHTML = `
-            <img src="${item.thumbnail}" alt="${item.title}">
-            <div>
-                <h4>${item.title} ${item.episode ? '- Épisode ' + item.episode : ''}</h4>
+            <div style="flex: 1;">
+                <h4>${item.title}</h4>
                 <p>${item.channel}</p>
                 <small>Visionné le ${item.watchedAt}</small>
             </div>
         `;
-        div.addEventListener('click', () => openVideoModal(item));
-        list.appendChild(div);
-    });
-}
-
-// === UPLOAD ===
-function openUploadModal() {
-    if (!currentUser) {
-        showNotification("Connectez-vous pour publier");
-        openAuthModal();
-        return;
-    }
-    
-    const modal = document.getElementById('uploadModal');
-    resetUploadForm();
-    modal.style.display = 'flex';
-}
-
-function closeUploadModal() {
-    document.getElementById('uploadModal').style.display = 'none';
-}
-
-function resetUploadForm() {
-    uploadStep = 1;
-    selectedFile = null;
-    
-    // Réinitialiser étapes
-    document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
-    document.getElementById('step1Indicator').classList.add('active');
-    
-    document.querySelectorAll('.upload-step-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById('uploadStep1').classList.add('active');
-    
-    // Réinitialiser champs
-    document.getElementById('videoFile').value = '';
-    document.getElementById('videoTitle').value = '';
-    document.getElementById('videoEpisode').value = '';
-    document.getElementById('videoDescription').value = '';
-    document.getElementById('fileInfo').innerHTML = '';
-    
-    // Désactiver boutons
-    document.getElementById('nextStep1').disabled = true;
-    document.getElementById('submitVideoBtn').disabled = true;
-}
-
-function handleFileSelect(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    // Vérifier type
-    const validTypes = ['video/mp4', 'video/mkv', 'video/avi', 'video/mov'];
-    if (!validTypes.includes(file.type)) {
-        showNotification("Format non supporté. Utilisez MP4, MKV, AVI ou MOV.");
-        return;
-    }
-    
-    selectedFile = file;
-    
-    // Afficher infos
-    document.getElementById('fileInfo').innerHTML = `
-        <p><strong>Fichier:</strong> ${file.name}</p>
-        <p><strong>Taille:</strong> ${formatFileSize(file.size)}</p>
-        <p><strong>Type:</strong> ${file.type}</p>
-    `;
-    
-    document.getElementById('nextStep1').disabled = false;
-    document.getElementById('summaryFile').textContent = file.name;
-}
-
-function nextUploadStep(step) {
-    uploadStep = step;
-    updateUploadSteps();
-    
-    if (step === 3) {
-        startVerification();
-    }
-}
-
-function prevUploadStep(step) {
-    uploadStep = step;
-    updateUploadSteps();
-}
-
-function updateUploadSteps() {
-    // Mettre à jour indicateurs
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById(`step${uploadStep}Indicator`).classList.add('active');
-    
-    // Mettre à jour contenus
-    document.querySelectorAll('.upload-step-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`uploadStep${uploadStep}`).classList.add('active');
-}
-
-function startVerification() {
-    const progressBar = document.getElementById('verificationProgress');
-    const progressText = document.getElementById('progressText');
-    const statusText = document.getElementById('verificationStatus');
-    const issuesDiv = document.getElementById('copyrightIssues');
-    const submitBtn = document.getElementById('submitVideoBtn');
-    
-    // Récupérer infos
-    const title = document.getElementById('videoTitle').value.toLowerCase();
-    const episode = document.getElementById('videoEpisode').value;
-    
-    document.getElementById('summaryTitle').textContent = title;
-    document.getElementById('summaryEpisode').textContent = `Épisode ${episode}`;
-    
-    // Réinitialiser
-    issuesDiv.style.display = 'none';
-    submitBtn.disabled = true;
-    progressBar.style.width = '0%';
-    progressText.textContent = '0%';
-    statusText.textContent = "Analyse en cours...";
-    statusText.style.color = '';
-    
-    // Simulation vérification
-    let progress = 0;
-    let hasIssues = false;
-    
-    const interval = setInterval(() => {
-        progress += 2;
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${progress}%`;
         
-        // Détection d'anime populaire
-        const popularAnime = ['naruto', 'one piece', 'attack on titan', 'dragon ball', 'bleach'];
-        if (progress >= 50 && popularAnime.some(anime => title.includes(anime))) {
-            hasIssues = true;
-            statusText.innerHTML = '<span style="color: #ff4757;">⚠️ Contenu protégé détecté</span>';
-        }
-        
-        if (progress >= 100) {
-            clearInterval(interval);
-            progressText.textContent = "100%";
-            
-            if (hasIssues) {
-                issuesDiv.style.display = 'block';
-                submitBtn.disabled = true;
-            } else {
-                statusText.innerHTML = '<span style="color: #2ecc71;">✓ Prêt à publier</span>';
-                submitBtn.disabled = false;
-            }
-        }
-    }, 50);
-}
-
-function submitVideo() {
-    const title = document.getElementById('videoTitle').value;
-    const episode = document.getElementById('videoEpisode').value;
-    const description = document.getElementById('videoDescription').value;
-    
-    if (!title || !episode) {
-        showNotification("Titre et épisode requis");
-        return;
-    }
-    
-    // Nouvelle vidéo
-    const newVideo = {
-        id: Date.now(),
-        title: title,
-        episode: parseInt(episode),
-        description: description,
-        channel: currentUser.name,
-        views: "0",
-        date: "À l'instant",
-        duration: "24:00",
-        thumbnail: `https://picsum.photos/320/180?random=${Date.now()}`,
-        videoUrl: null,
-        userId: currentUser.id,
-        likes: 0,
-        dislikes: 0,
-        visibility: "public"
-    };
-    
-    // Stocker la vidéo localement
-    if (selectedFile) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            newVideo.videoData = e.target.result;
-            finishVideoUpload(newVideo);
+        div.onclick = function() {
+            playVideo(item);
         };
-        reader.readAsDataURL(selectedFile);
-    } else {
-        finishVideoUpload(newVideo);
-    }
-}
-
-function finishVideoUpload(video) {
-    // Ajouter aux listes
-    videos.unshift(video);
-    myVideos.unshift(video);
-    
-    // Sauvegarder
-    saveToLocalStorage('animeref_videos', videos);
-    saveToLocalStorage('animeref_myvideos', myVideos);
-    
-    // Mettre à jour interface
-    loadVideos();
-    loadMyVideos();
-    
-    // Fermer et notifier
-    closeUploadModal();
-    showNotification("✅ Anime publié avec succès!");
-    
-    // Afficher section mes vidéos
-    showSection('my-videos');
-}
-
-// === MES VIDÉOS ===
-function loadMyVideos() {
-    const container = document.getElementById('myUploadedVideos');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    if (!currentUser) {
-        container.innerHTML = '<p class="empty-state">Connectez-vous pour voir vos vidéos</p>';
-        return;
-    }
-    
-    const userVideos = myVideos.filter(v => v.userId === currentUser.id);
-    
-    if (userVideos.length === 0) {
-        container.innerHTML = '<p class="empty-state">Vous n\'avez pas encore publié d\'anime</p>';
-        return;
-    }
-    
-    userVideos.forEach(video => {
-        const card = createVideoCard(video);
-        container.appendChild(card);
-    });
-}
-
-// === AUTHENTIFICATION ===
-function openAuthModal() {
-    document.getElementById('authModal').style.display = 'flex';
-    switchAuthTab('login');
-}
-
-function closeAuthModal() {
-    document.getElementById('authModal').style.display = 'none';
-}
-
-function switchAuthTab(tab) {
-    // Tabs
-    document.getElementById('loginTab').classList.remove('active');
-    document.getElementById('signupTab').classList.remove('active');
-    
-    // Forms
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'none';
-    
-    if (tab === 'login') {
-        document.getElementById('loginTab').classList.add('active');
-        document.getElementById('loginForm').style.display = 'block';
-    } else {
-        document.getElementById('signupTab').classList.add('active');
-        document.getElementById('signupForm').style.display = 'block';
-    }
-}
-
-function login() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        showNotification("Email et mot de passe requis");
-        return;
-    }
-    
-    if (!email.includes('@')) {
-        showNotification("Email invalide");
-        return;
-    }
-    
-    // Chercher utilisateur
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (!user) {
-        showNotification("Email ou mot de passe incorrect");
-        return;
-    }
-    
-    // Connexion réussie
-    currentUser = { id: user.id, name: user.name, email: user.email };
-    saveToLocalStorage('animeref_currentUser', currentUser);
-    
-    updateAuthUI();
-    closeAuthModal();
-    showNotification(`👋 Bienvenue ${currentUser.name}!`);
-    
-    // Recharger
-    loadMyVideos();
-    loadWatchHistory();
-}
-
-function signup() {
-    const name = document.getElementById('signupName').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    
-    if (!name || !email || !password || !confirmPassword) {
-        showNotification("Tous les champs sont requis");
-        return;
-    }
-    
-    if (password !== confirmPassword) {
-        showNotification("Les mots de passe ne correspondent pas");
-        return;
-    }
-    
-    if (!email.includes('@')) {
-        showNotification("Email invalide");
-        return;
-    }
-    
-    if (users.some(u => u.email === email)) {
-        showNotification("Cet email est déjà utilisé");
-        return;
-    }
-    
-    // Nouvel utilisateur
-    const newUser = {
-        id: Date.now(),
-        name: name,
-        email: email,
-        password: password
-    };
-    
-    users.push(newUser);
-    currentUser = { id: newUser.id, name: newUser.name, email: newUser.email };
-    
-    // Sauvegarder
-    saveToLocalStorage('animeref_users', users);
-    saveToLocalStorage('animeref_currentUser', currentUser);
-    
-    updateAuthUI();
-    closeAuthModal();
-    showNotification(`🎉 Bienvenue ${currentUser.name}!`);
-    
-    // Recharger
-    loadMyVideos();
-}
-
-function logout() {
-    currentUser = null;
-    localStorage.removeItem('animeref_currentUser');
-    updateAuthUI();
-    showNotification("Déconnexion réussie");
-    loadMyVideos();
-    loadWatchHistory();
-}
-
-function checkAuthStatus() {
-    if (currentUser) {
-        updateAuthUI();
-    }
-}
-
-function updateAuthUI() {
-    const signInBtn = document.getElementById('signInBtn');
-    const userProfileBtn = document.getElementById('userProfileBtn');
-    
-    if (currentUser) {
-        signInBtn.style.display = 'none';
-        userProfileBtn.style.display = 'flex';
-        document.getElementById('userName').textContent = currentUser.name;
         
-        // Menu profil
-        userProfileBtn.onclick = function(e) {
-            e.stopPropagation();
-            const menu = document.createElement('div');
-            menu.style.cssText = `
-                position: absolute;
-                top: 60px;
-                right: 20px;
-                background-color: #1a1a1a;
-                border: 1px solid #333;
-                border-radius: 8px;
-                padding: 10px 0;
-                min-width: 200px;
-                z-index: 1000;
-            `;
-            
-            menu.innerHTML = `
-                <div style="padding: 10px 20px; color: white; cursor: pointer;" onclick="showSection('my-videos')">
-                    <i class="fas fa-video"></i> Mes vidéos
-                </div>
-                <div style="padding: 10px 20px; color: #ff4757; cursor: pointer; border-top: 1px solid #333;" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> Déconnexion
-                </div>
-            `;
-            
-            document.body.appendChild(menu);
-            
-            setTimeout(() => {
-                const closeMenu = (e) => {
-                    if (!menu.contains(e.target) && e.target !== userProfileBtn) {
-                        menu.remove();
-                        document.removeEventListener('click', closeMenu);
-                    }
-                };
-                document.addEventListener('click', closeMenu);
-            }, 0);
-        };
-    } else {
-        signInBtn.style.display = 'flex';
-        userProfileBtn.style.display = 'none';
-    }
+        container.appendChild(div);
+    });
 }
 
 // === DONS ===
@@ -705,146 +565,127 @@ function closeDonateModal() {
 }
 
 function selectDonationAmount(amount) {
-    document.getElementById('customAmount').value = amount;
-    
-    // Highlight selected
-    document.querySelectorAll('.donation-amount').forEach(btn => {
+    // Désélectionner tous les boutons
+    document.querySelectorAll('.amount-btn').forEach(btn => {
         btn.classList.remove('selected');
     });
+    
+    // Sélectionner le bouton cliqué
     event.target.classList.add('selected');
+    
+    // Mettre à jour le champ personnalisé
+    document.getElementById('customAmount').value = amount;
 }
 
-function processPayment() {
-    const cardNumber = document.getElementById('cardNumber').value;
-    const expiryDate = document.getElementById('expiryDate').value;
-    const cvv = document.getElementById('cvv').value;
-    const cardName = document.getElementById('cardName').value;
+function processDonation() {
     const amount = document.getElementById('customAmount').value;
     
-    if (!cardNumber || !expiryDate || !cvv || !cardName || !amount) {
-        showNotification("Veuillez remplir tous les champs");
+    if (!amount || amount < 1) {
+        showNotification("Veuillez sélectionner un montant");
         return;
     }
     
-    showNotification(`💳 Paiement de ${amount}€ en cours...`);
+    showNotification(`Merci pour votre don de ${amount}€ !`);
     
+    // Simuler le traitement
     setTimeout(() => {
         closeDonateModal();
-        showNotification(`✅ Don de ${amount}€ effectué! Merci.`);
+        showNotification("Don traité avec succès");
         
-        // Réinitialiser formulaire
-        document.getElementById('cardNumber').value = '';
-        document.getElementById('expiryDate').value = '';
-        document.getElementById('cvv').value = '';
-        document.getElementById('cardName').value = '';
-        document.getElementById('customAmount').value = '';
-        document.querySelectorAll('.donation-amount').forEach(btn => {
+        // Réinitialiser
+        document.querySelectorAll('.amount-btn').forEach(btn => {
             btn.classList.remove('selected');
         });
-    }, 2000);
+        document.getElementById('customAmount').value = '';
+    }, 1000);
+}
+
+// === RECHERCHE ===
+function searchVideos() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    
+    if (!query) {
+        loadVideos();
+        return;
+    }
+    
+    const results = videos.filter(video => 
+        video.title.toLowerCase().includes(query) ||
+        (video.description && video.description.toLowerCase().includes(query))
+    );
+    
+    // Mettre à jour toutes les sections
+    ['homeVideos', 'trendingVideos'].forEach(sectionId => {
+        const container = document.getElementById(sectionId);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (results.length === 0) {
+            container.innerHTML = '<p class="empty-state">Aucun résultat trouvé</p>';
+            return;
+        }
+        
+        results.forEach(video => {
+            const card = createVideoCard(video);
+            container.appendChild(card);
+        });
+    });
 }
 
 // === ACTIONS VIDÉO ===
 function likeVideo() {
     if (!currentUser) {
-        showNotification("Connectez-vous pour aimer");
+        showNotification("Connectez-vous pour aimer une vidéo");
         return;
     }
     
-    if (!currentPlayingVideo) return;
-    
-    const video = videos.find(v => v.id === currentPlayingVideo.id);
-    if (video) {
-        video.likes = (video.likes || 0) + 1;
-        document.getElementById('likeCount').textContent = video.likes;
-        saveToLocalStorage('animeref_videos', videos);
-    }
-}
-
-function dislikeVideo() {
-    if (!currentUser) {
-        showNotification("Connectez-vous pour réagir");
-        return;
-    }
-    
-    if (!currentPlayingVideo) return;
-    
-    const video = videos.find(v => v.id === currentPlayingVideo.id);
-    if (video) {
-        video.dislikes = (video.dislikes || 0) + 1;
-        document.getElementById('dislikeCount').textContent = video.dislikes;
-        saveToLocalStorage('animeref_videos', videos);
-    }
-}
-
-function shareVideo() {
-    if (!currentPlayingVideo) return;
-    
-    const url = `animeref.com/watch?v=${currentPlayingVideo.id}`;
-    navigator.clipboard.writeText(url).then(() => {
-        showNotification("✅ Lien copié!");
-    });
+    // Logique de like (simplifiée)
+    showNotification("Merci pour votre like !");
 }
 
 function deleteVideo() {
-    if (!currentPlayingVideo || !currentUser) return;
+    if (!currentUser) return;
     
-    if (currentPlayingVideo.userId !== currentUser.id) {
+    const player = document.getElementById('videoPlayer');
+    const videoSrc = player.src;
+    
+    // Trouver la vidéo par sa source
+    const videoIndex = videos.findIndex(v => 
+        v.videoData === videoSrc || v.videoUrl === videoSrc
+    );
+    
+    if (videoIndex === -1) return;
+    
+    const video = videos[videoIndex];
+    
+    // Vérifier que c'est bien la vidéo de l'utilisateur
+    if (video.userId !== currentUser.id) {
         showNotification("Vous ne pouvez pas supprimer cette vidéo");
         return;
     }
     
-    if (!confirm("Supprimer cette vidéo ?")) return;
-    
-    // Supprimer
-    videos = videos.filter(v => v.id !== currentPlayingVideo.id);
-    myVideos = myVideos.filter(v => v.id !== currentPlayingVideo.id);
-    
-    saveToLocalStorage('animeref_videos', videos);
-    saveToLocalStorage('animeref_myvideos', myVideos);
-    
-    // Mettre à jour
-    loadVideos();
-    loadMyVideos();
-    closeVideoModal();
-    showNotification("✅ Vidéo supprimée");
-}
-
-// === RECHERCHE ===
-function searchVideos() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    
-    if (!term) {
+    if (confirm("Voulez-vous vraiment supprimer cette vidéo ?")) {
+        // Supprimer la vidéo
+        videos.splice(videoIndex, 1);
+        
+        // Sauvegarder
+        localStorage.setItem('animeref_videos', JSON.stringify(videos));
+        
+        // Fermer le modal
+        closeVideoModal();
+        
+        // Recharger les vidéos
         loadVideos();
-        return;
+        
+        // Notifier
+        showNotification("Vidéo supprimée avec succès");
     }
-    
-    const results = videos.filter(v => 
-        v.title.toLowerCase().includes(term) || 
-        v.description.toLowerCase().includes(term)
-    );
-    
-    // Mettre à jour toutes les sections
-    ['homeVideos', 'trendingVideos', 'animeListVideos'].forEach(sectionId => {
-        const grid = document.getElementById(sectionId);
-        if (!grid) return;
-        
-        grid.innerHTML = '';
-        
-        results.forEach(video => {
-            const card = createVideoCard(video);
-            grid.appendChild(card);
-        });
-        
-        if (results.length === 0) {
-            grid.innerHTML = '<p class="empty-state">Aucun résultat</p>';
-        }
-    });
 }
 
-// === UTILITAIRES ===
+// === NAVIGATION ===
 function showSection(sectionId) {
-    // Mettre à jour sidebar
+    // Mettre à jour la sidebar
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.classList.remove('active');
         if (item.getAttribute('data-section') === sectionId) {
@@ -852,36 +693,28 @@ function showSection(sectionId) {
         }
     });
     
-    // Afficher section
+    // Afficher la section
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
     document.getElementById(sectionId).classList.add('active');
     
-    // Recharger si nécessaire
-    if (sectionId === 'my-videos') loadMyVideos();
-    if (sectionId === 'history') loadWatchHistory();
+    // Charger les données si nécessaire
+    if (sectionId === 'history') {
+        showHistory();
+    }
+    if (sectionId === 'my-videos') {
+        loadMyVideos();
+    }
 }
 
+// === NOTIFICATIONS ===
 function showNotification(message) {
     const notification = document.getElementById('notification');
-    const messageSpan = document.getElementById('notificationMessage');
-    
-    messageSpan.textContent = message;
+    notification.textContent = message;
     notification.style.display = 'block';
     
     setTimeout(() => {
         notification.style.display = 'none';
     }, 3000);
-}
-
-function formatFileSize(bytes) {
-    if (bytes < 1024) return bytes + ' bytes';
-    if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-    if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
-    return (bytes / 1073741824).toFixed(2) + ' GB';
-}
-
-function saveToLocalStorage(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
 }
