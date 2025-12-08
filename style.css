@@ -1,53 +1,153 @@
-<div class="content">
-    <!-- Accueil -->
-    <div id="home-section" class="section active">
-        <div class="video-container">
-            <div class="video-header">
-                <h2 id="video-title">Aucune vidéo sélectionnée</h2>
-                <div class="video-views">
-                    <i class="fas fa-eye"></i> <span id="views-count">0</span> vues
-                </div>
-            </div>
-            
-            <div class="video-player">
-                <div id="no-video" class="no-video">
-                    <i class="fas fa-film"></i>
-                    <p>Sélectionnez une vidéo dans la bibliothèque</p>
-                </div>
-                <video id="video-element" controls style="display: none;">
-                    Votre navigateur ne supporte pas les vidéos.
-                </video>
-            </div>
-            
-            <div class="video-controls">
-                <button id="play-btn" class="btn btn-primary">
-                    <i class="fas fa-play"></i> Lire
-                </button>
-                <button id="pause-btn" class="btn btn-secondary">
-                    <i class="fas fa-pause"></i> Pause
-                </button>
-                <button id="like-btn" class="btn btn-secondary">
-                    <i class="far fa-heart"></i> <span id="like-count">0</span>
-                </button>
-                <button id="subscribe-btn" class="btn btn-primary">
-                    <i class="fas fa-user-plus"></i> S'abonner
-                </button>
-            </div>
-        </div>
-        
-        <div class="comments-section">
-            <h3><i class="fas fa-comments"></i> Commentaires</h3>
-            <div class="comment-form">
-                <input type="text" id="comment-input" placeholder="Écrire un commentaire..." class="comment-input">
-                <button id="submit-comment" class="btn btn-primary">
-                    <i class="fas fa-paper-plane"></i> Publier
-                </button>
-            </div>
-            <div id="comments-list" class="comments-list">
-                <p class="empty-message">Aucun commentaire. Soyez le premier !</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Autres sections restent simples... -->
-</div>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+}
+
+/* Header */
+header {
+    background-color: #2a2a2a;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f47521;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #f47521;
+}
+
+nav a {
+    color: #ddd;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: #f47521;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Section Titre */
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #f47521;
+    border-left: 4px solid #f47521;
+    padding-left: 0.5rem;
+}
+
+/* Grille de vidéos */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.video-card {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.video-card:hover {
+    transform: scale(1.05);
+}
+
+.video-thumbnail {
+    width: 100%;
+    height: 120px;
+    background-color: #444;
+    background-image: url('https://via.placeholder.com/300x120/444/666?text=Thumbnail');
+    background-size: cover;
+    background-position: center;
+}
+
+.video-info {
+    padding: 0.8rem;
+}
+
+.video-title {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    color: #fff;
+}
+
+.video-meta {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+/* Sidebar pour historique / import */
+.sidebar {
+    background-color: #252525;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.sidebar h3 {
+    color: #f47521;
+    margin-bottom: 1rem;
+}
+
+.btn {
+    background-color: #f47521;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.btn:hover {
+    background-color: #d8641b;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: #888;
+    border-top: 1px solid #333;
+    margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
