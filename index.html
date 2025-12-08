@@ -63,16 +63,72 @@
         </nav>
     </header>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-section">
-                <h3><i class="fas fa-fire"></i> Tendance</h3>
-                <a href="#" class="sidebar-item active" data-section="home">
-                    <i class="fas fa-play"></i> Vidéo en cours
-                </a>
-            </div>
+    <div class="sidebar">
+    <!-- Section Navigation -->
+    <div class="sidebar-section">
+        <h3><i class="fas fa-compass"></i> Navigation</h3>
+        <a href="#home-section" class="sidebar-item active" data-section="home">
+            <i class="fas fa-home"></i> Accueil
+        </a>
+        <a href="#history-section" class="sidebar-item" data-section="history">
+            <i class="fas fa-history"></i> Historique
+        </a>
+        <a href="#subscriptions-section" class="sidebar-item" data-section="subscriptions">
+            <i class="fas fa-users"></i> Abonnements
+        </a>
+        <a href="#likes-section" class="sidebar-item" data-section="likes">
+            <i class="fas fa-heart"></i> Vidéos aimées
+        </a>
+        <a href="#trending-section" class="sidebar-item" data-section="trending">
+            <i class="fas fa-fire"></i> Tendances
+        </a>
+    </div>
+    
+    <!-- Section Création (visible seulement si connecté) -->
+    <div class="sidebar-section upload-only" style="display: none;">
+        <h3><i class="fas fa-plus-circle"></i> Création</h3>
+        <a href="#upload-section" class="sidebar-item" data-section="upload">
+            <i class="fas fa-upload"></i> Upload une vidéo
+        </a>
+        <a href="#my-videos-section" class="sidebar-item" data-section="my-videos">
+            <i class="fas fa-film"></i> Mes vidéos
+        </a>
+        <a href="#channel-section" class="sidebar-item" data-section="channel">
+            <i class="fas fa-user-circle"></i> Ma chaîne
+        </a>
+    </div>
+    
+    <!-- Section Abonnements rapides -->
+    <div class="sidebar-section">
+        <h3><i class="fas fa-user-friends"></i> Abonnements</h3>
+        <div id="quick-subs" class="quick-subs">
+            <p class="empty-message">Connectez-vous pour voir vos abonnements</p>
+        </div>
+    </div>
+    
+    <!-- Section Tendances -->
+    <div class="sidebar-section">
+        <h3><i class="fas fa-chart-line"></i> Tendance du jour</h3>
+        <div class="trending-tags">
+            <span class="tag">#AMV</span>
+            <span class="tag">#Original</span>
+            <span class="tag">#Animation</span>
+            <span class="tag">#Fanart</span>
+            <span class="tag">#Manga</span>
+            <span class="tag">#Création</span>
+        </div>
+    </div>
+    
+    <!-- Bouton Dons dans sidebar -->
+    <div class="sidebar-donate">
+        <button id="sidebar-donate" class="btn btn-warning btn-block">
+            <i class="fas fa-heart"></i> Soutenir ANIMEREF
+        </button>
+        <p class="donate-note">
+            <small>Les dons aident à garder le site gratuit pour tous</small>
+        </p>
+    </div>
+</div>
             
             <div class="sidebar-section">
                 <h3><i class="fas fa-user"></i> Mon Compte</h3>
@@ -257,32 +313,212 @@
     </div>
 </div>
 
-<!-- Modal Register -->
+<!-- ==================== MODALES D'AUTHENTIFICATION ==================== -->
+
+<!-- Modale Principale Auth -->
+<div id="auth-modal" class="modal">
+    <div class="modal-content auth-modal">
+        <span class="close" onclick="closeModal('auth-modal')">&times;</span>
+        
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-play-circle"></i>
+                <span>ANIMEREF</span>
+            </div>
+            <h2>Bienvenue !</h2>
+            <p>Connectez-vous pour uploader, commenter et vous abonner</p>
+        </div>
+        
+        <div class="auth-options">
+            <!-- Option Google -->
+            <button id="google-login" class="auth-btn google-btn">
+                <div class="auth-btn-icon">
+                    <i class="fab fa-google"></i>
+                </div>
+                <div class="auth-btn-text">
+                    <span class="auth-btn-title">Continuer avec Google</span>
+                    <span class="auth-btn-subtitle">Connexion rapide et sécurisée</span>
+                </div>
+                <div class="auth-btn-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </button>
+            
+            <!-- Option Email -->
+            <button id="email-login" class="auth-btn email-btn">
+                <div class="auth-btn-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="auth-btn-text">
+                    <span class="auth-btn-title">Continuer avec Email</span>
+                    <span class="auth-btn-subtitle">Utilisez votre adresse email</span>
+                </div>
+                <div class="auth-btn-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </button>
+            
+            <div class="auth-divider">
+                <span class="divider-line"></span>
+                <span class="divider-text">ou</span>
+                <span class="divider-line"></span>
+            </div>
+            
+            <!-- Créer un compte -->
+            <button onclick="showModal('register-modal')" class="auth-btn create-btn">
+                <div class="auth-btn-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="auth-btn-text">
+                    <span class="auth-btn-title">Créer un compte</span>
+                    <span class="auth-btn-subtitle">C'est gratuit et rapide</span>
+                </div>
+            </button>
+        </div>
+        
+        <div class="auth-footer">
+            <p class="terms">
+                <small>En continuant, vous acceptez nos 
+                    <a href="#">Conditions d'utilisation</a> et 
+                    <a href="#">Politique de confidentialité</a>
+                </small>
+            </p>
+            <p class="guest-option">
+                <a href="#" onclick="closeModal('auth-modal')">Continuer en tant qu'invité</a>
+                <small>(fonctionnalités limitées)</small>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Modale Login Email -->
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('login-modal')">&times;</span>
+        
+        <div class="modal-header">
+            <h3><i class="fas fa-sign-in-alt"></i> Connexion Email</h3>
+            <p>Entrez vos identifiants</p>
+        </div>
+        
+        <form id="login-form" class="auth-form">
+            <div class="form-group">
+                <label for="login-username">
+                    <i class="fas fa-user"></i> Nom d'utilisateur
+                </label>
+                <input type="text" id="login-username" class="form-input" 
+                       placeholder="Votre pseudo" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">
+                    <i class="fas fa-lock"></i> Mot de passe
+                </label>
+                <input type="password" id="login-password" class="form-input" 
+                       placeholder="Votre mot de passe" required>
+                <div class="password-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Se souvenir de moi
+                    </label>
+                    <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block btn-large">
+                <i class="fas fa-sign-in-alt"></i> Se connecter
+            </button>
+            
+            <div class="form-footer">
+                <p>Pas encore de compte ? 
+                    <a href="#" onclick="closeModal('login-modal'); showModal('register-modal')">
+                        S'inscrire
+                    </a>
+                </p>
+                <p>
+                    <a href="#" onclick="closeModal('login-modal'); showModal('auth-modal')">
+                        <i class="fas fa-arrow-left"></i> Retour aux options de connexion
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modale Register -->
 <div id="register-modal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModals()">&times;</span>
-        <h3><i class="fas fa-user-plus"></i> Inscription</h3>
-        <form id="register-form">
+        <span class="close" onclick="closeModal('register-modal')">&times;</span>
+        
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus"></i> Créer un compte</h3>
+            <p>Rejoignez la communauté ANIMEREF</p>
+        </div>
+        
+        <form id="register-form" class="auth-form">
             <div class="form-group">
-                <label>Nom d'utilisateur *</label>
-                <input type="text" id="register-username" class="form-input" required placeholder="Choisissez un pseudo">
+                <label for="register-username">
+                    <i class="fas fa-user"></i> Nom d'utilisateur *
+                </label>
+                <input type="text" id="register-username" class="form-input" 
+                       placeholder="Choisissez un pseudo unique" required>
+                <small class="form-help">Visible par tous les utilisateurs</small>
             </div>
+            
             <div class="form-group">
-                <label>Email *</label>
-                <input type="email" id="register-email" class="form-input" required placeholder="votre@email.com">
+                <label for="register-email">
+                    <i class="fas fa-envelope"></i> Adresse email *
+                </label>
+                <input type="email" id="register-email" class="form-input" 
+                       placeholder="votre@email.com" required>
+                <small class="form-help">Nous ne partagerons jamais votre email</small>
             </div>
+            
             <div class="form-group">
-                <label>Mot de passe *</label>
-                <input type="password" id="register-password" class="form-input" required placeholder="Minimum 6 caractères">
+                <label for="register-password">
+                    <i class="fas fa-lock"></i> Mot de passe *
+                </label>
+                <input type="password" id="register-password" class="form-input" 
+                       placeholder="Minimum 6 caractères" required>
+                <div class="password-strength">
+                    <div class="strength-bar"></div>
+                    <small>Force du mot de passe</small>
+                </div>
             </div>
+            
             <div class="form-group">
-                <label>Confirmer le mot de passe *</label>
-                <input type="password" id="register-confirm" class="form-input" required placeholder="Retapez votre mot de passe">
+                <label for="register-confirm">
+                    <i class="fas fa-lock"></i> Confirmer le mot de passe *
+                </label>
+                <input type="password" id="register-confirm" class="form-input" 
+                       placeholder="Retapez votre mot de passe" required>
             </div>
-            <button type="submit" class="btn btn-success">
+            
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" required>
+                    J'accepte les <a href="#">Conditions d'utilisation</a> et la 
+                    <a href="#">Politique de confidentialité</a>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox">
+                    Je souhaite recevoir les nouveautés et recommandations (optionnel)
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-block btn-large">
                 <i class="fas fa-user-plus"></i> Créer mon compte
             </button>
-            <button type="button" onclick="closeModals()" class="btn btn-secondary">Annuler</button>
+            
+            <div class="form-footer">
+                <p>Déjà un compte ? 
+                    <a href="#" onclick="closeModal('register-modal'); showModal('login-modal')">
+                        Se connecter
+                    </a>
+                </p>
+            </div>
         </form>
     </div>
 </div>
