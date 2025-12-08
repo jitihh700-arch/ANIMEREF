@@ -1,1167 +1,720 @@
-// ANIMEREF - Application JavaScript
-
-// État global
-const AppState = {
-    currentUser: JSON.parse(localStorage.getItem('animeRefUser')) || null,
-    users: JSON.parse(localStorage.getItem('animeRefUsers')) || {
-        'admin': { 
-            id: 'admin_1', 
-            username: 'admin', 
-            email: 'admin@animeref.com', 
-            password: 'admin123', 
-            isAdmin: true, 
-            videos: [],
-            joinDate: new Date().toLocaleDateString('fr-FR')
-        }
+// Données de test
+let videos = [
+    {
+        id: 1,
+        title: "Tutoriel JavaScript pour débutants",
+        channel: "DevMaster",
+        views: "124K",
+        date: "Il y a 2 jours",
+        duration: "15:30",
+        thumbnail: "https://picsum.photos/320/180?random=1",
+        description: "Apprenez les bases de JavaScript avec ce tutoriel complet pour débutants.",
+        userId: 2
     },
-    videos: JSON.parse(localStorage.getItem('animeRefVideos')) || [],
-    history: JSON.parse(localStorage.getItem('animeRefHistory')) || [],
-    comments: JSON.parse(localStorage.getItem('animeRefComments')) || {},
-    likes: JSON.parse(localStorage.getItem('animeRefLikes')) || {},
-    subscriptions: JSON.parse(localStorage.getItem('animeRefSubs')) || {},
-    views: JSON.parse(localStorage.getItem('animeRefViews')) || {},
-    currentVideoId: null,
-    uploadStep: 1,
-    currentVideoFile: null
-};
+    {
+        id: 2,
+        title: "Les meilleures destinations 2024",
+        channel: "TravelWorld",
+        views: "892K",
+        date: "Il y a 1 semaine",
+        duration: "22:45",
+        thumbnail: "https://picsum.photos/320/180?random=2",
+        description: "Découvrez les destinations les plus populaires pour vos vacances 2024.",
+        userId: 3
+    },
+    {
+        id: 3,
+        title: "Recette de cuisine facile",
+        channel: "ChefHome",
+        views: "543K",
+        date: "Il y a 3 jours",
+        duration: "10:15",
+        thumbnail: "https://picsum.photos/320/180?random=3",
+        description: "Apprenez à préparer un délicieux plat en moins de 30 minutes.",
+        userId: 4
+    },
+    {
+        id: 4,
+        title: "Entraînement complet à la maison",
+        channel: "FitLife",
+        views: "321K",
+        date: "Il y a 1 mois",
+        duration: "45:20",
+        thumbnail: "https://picsum.photos/320/180?random=4",
+        description: "Programme d'entraînement sans équipement pour rester en forme.",
+        userId: 5
+    }
+];
+
+let users = [
+    { id: 1, name: "Vous", email: "vous@exemple.com" },
+    { id: 2, name: "DevMaster", email: "dev@exemple.com" },
+    { id: 3, name: "TravelWorld", email: "travel@exemple.com" },
+    { id: 4, name: "ChefHome", email: "chef@exemple.com" },
+    { id: 5, name: "FitLife", email: "fit@exemple.com" }
+];
+
+let currentUser = null;
+let watchHistory = [];
+let myVideos = [];
+let uploadStep = 1;
+let selectedFile = null;
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', function() {
-    initApp();
+    loadVideos();
+    loadWatchHistory();
+    loadMyVideos();
+    checkAuthStatus();
 });
 
-function initApp() {
-    // Navigation
-    initNavigation();
+// Charger les vidéos
+function loadVideos() {
+    const homeGrid = document.getElementById('homeVideos');
+    const exploreGrid = document.getElementById('exploreVideos');
+    const subscriptionsGrid = document.getElementById('subscriptionsVideos');
     
-    // Authentification
-    initAuth();
+    homeGrid.innerHTML = '';
+    exploreGrid.innerHTML = '';
+    subscriptionsGrid.innerHTML = '';
     
-    // Vidéo
-    initVideo();
-    
-    // Upload
-    initUpload();
-    
-    // Recherche
-    initSearch();
-    
-    // Dons
-    initDonations();
-    
-    // Sidebar
-    initSidebar();
-    
-    // Initial render
-    updateUI();
-    renderLibrary();
-    renderHistory();
-    
-    // Message de bienvenue
-    setTimeout(() => {
-        showMessage('Bienvenue sur ANIMEREF !', 'success');
-    }, 1000);
-}
-
-// ==================== NAVIGATION ====================
-function initNavigation() {
-    // Navigation principale
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const sectionId = this.id.replace('nav-', '') + '-section';
-            
-            // Mettre à jour la navigation
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Afficher la section
-            showSection(sectionId);
-        });
-    });
-    
-    // Navigation sidebar
-    document.querySelector('.sidebar-item[data-section="home"]').addEventListener('click', function() {
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById('nav-home').classList.add('active');
-        showSection('home-section');
+    videos.forEach(video => {
+        const videoElement = createVideoCard(video);
+        homeGrid.appendChild(videoElement.cloneNode(true));
+        exploreGrid.appendChild(videoElement.cloneNode(true));
+        subscriptionsGrid.appendChild(videoElement.cloneNode(true));
     });
 }
 
+// Créer une carte vidéo
+function createVideoCard(video) {
+    const div = document.createElement('div');
+    div.className = 'video-card';
+    div.onclick = () => openVideoModal(video);
+    
+    div.innerHTML = `
+        <div class="video-thumbnail">
+            <img src="${video.thumbnail}" alt="${video.title}">
+            <div class="video-duration">${video.duration}</div>
+        </div>
+        <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <p class="video-meta">${video.channel} • ${video.views} vues • ${video.date}</p>
+        </div>
+    `;
+    
+    return div;
+}
+
+// Charger l'historique
+function loadWatchHistory() {
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '';
+    
+    if (watchHistory.length === 0) {
+        historyList.innerHTML = '<p class="empty-state">Aucune vidéo visionnée récemment.</p>';
+        return;
+    }
+    
+    watchHistory.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `
+            <div class="history-video">
+                <img src="${item.thumbnail}" alt="${item.title}">
+                <div class="history-info">
+                    <h4>${item.title}</h4>
+                    <p>${item.channel} • Visionné le ${item.watchedAt}</p>
+                </div>
+            </div>
+        `;
+        div.onclick = () => openVideoModal(item);
+        historyList.appendChild(div);
+    });
+}
+
+// Charger mes vidéos
+function loadMyVideos() {
+    const myVideosList = document.getElementById('myUploadedVideos');
+    myVideosList.innerHTML = '';
+    
+    if (myVideos.length === 0) {
+        myVideosList.innerHTML = '<p class="empty-state">Vous n\'avez pas encore publié de vidéos.</p>';
+        return;
+    }
+    
+    myVideos.forEach(video => {
+        const videoElement = createVideoCard(video);
+        myVideosList.appendChild(videoElement);
+    });
+}
+
+// Afficher une section
 function showSection(sectionId) {
-    // Masquer toutes les sections
-    document.querySelectorAll('.section').forEach(section => {
+    // Mettre à jour la sidebar
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    
+    // Afficher la section correspondante
+    document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
-    
-    // Afficher la section demandée
-    const section = document.getElementById(sectionId);
-    if (section) {
-        section.classList.add('active');
-    }
+    document.getElementById(sectionId).classList.add('active');
 }
 
-// ==================== AUTHENTIFICATION ====================
-function initAuth() {
-    // Boutons
-    document.getElementById('login-btn').addEventListener('click', () => showModal('login-modal'));
-    document.getElementById('register-btn').addEventListener('click', () => showModal('register-modal'));
-    document.getElementById('logout-btn').addEventListener('click', logout);
+// Ouvrir modal vidéo
+function openVideoModal(video) {
+    const modal = document.getElementById('videoModal');
+    const player = document.getElementById('videoPlayer');
+    const videoSource = video.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
     
-    // Formulaires
-    document.getElementById('login-form').addEventListener('submit', handleLogin);
-    document.getElementById('register-form').addEventListener('submit', handleRegister);
-}
-
-function handleLogin(e) {
-    e.preventDefault();
-    
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-    
-    const user = AppState.users[username];
-    
-    if (user && user.password === password) {
-        AppState.currentUser = user;
-        localStorage.setItem('animeRefUser', JSON.stringify(user));
-        
-        updateUI();
-        closeModal('login-modal');
-        showMessage(`Bienvenue ${username} !`, 'success');
-        
-        // Réinitialiser le formulaire
-        document.getElementById('login-form').reset();
-    } else {
-        showMessage('Identifiants incorrects', 'error');
-    }
-}
-
-function handleRegister(e) {
-    e.preventDefault();
-    
-    const username = document.getElementById('register-username').value;
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    const confirm = document.getElementById('register-confirm').value;
-    
-    if (password !== confirm) {
-        showMessage('Les mots de passe ne correspondent pas', 'error');
-        return;
-    }
-    
-    if (AppState.users[username]) {
-        showMessage('Ce nom d\'utilisateur existe déjà', 'error');
-        return;
-    }
-    
-    const userId = 'user_' + Date.now();
-    const user = {
-        id: userId,
-        username: username,
-        email: email,
-        password: password,
-        avatar: `https://ui-avatars.com/api/?name=${username}&background=f47521&color=fff`,
-        joinDate: new Date().toLocaleDateString('fr-FR'),
-        videos: [],
-        subscribers: 0
-    };
-    
-    AppState.users[username] = user;
-    AppState.currentUser = user;
-    
-    localStorage.setItem('animeRefUsers', JSON.stringify(AppState.users));
-    localStorage.setItem('animeRefUser', JSON.stringify(user));
-    
-    updateUI();
-    closeModal('register-modal');
-    showMessage(`Compte créé pour ${username} !`, 'success');
-    
-    // Réinitialiser le formulaire
-    document.getElementById('register-form').reset();
-}
-
-function logout() {
-    AppState.currentUser = null;
-    localStorage.removeItem('animeRefUser');
-    
-    updateUI();
-    showMessage('Déconnexion réussie', 'success');
-}
-
-// ==================== VIDÉO ====================
-function initVideo() {
-    const videoElement = document.getElementById('video-element');
-    const playBtn = document.getElementById('play-btn');
-    const pauseBtn = document.getElementById('pause-btn');
-    const likeBtn = document.getElementById('like-btn');
-    const subscribeBtn = document.getElementById('subscribe-btn');
-    const deleteBtn = document.getElementById('delete-video-btn');
-    
-    playBtn.addEventListener('click', () => {
-        if (videoElement.src) {
-            videoElement.play();
-        }
-    });
-    
-    pauseBtn.addEventListener('click', () => {
-        videoElement.pause();
-    });
-    
-    likeBtn.addEventListener('click', () => {
-        if (AppState.currentVideoId) {
-            toggleLike(AppState.currentVideoId);
-        }
-    });
-    
-    subscribeBtn.addEventListener('click', () => {
-        if (AppState.currentVideoId) {
-            const video = AppState.videos.find(v => v.id === AppState.currentVideoId);
-            if (video) {
-                toggleSubscription(video.author);
-            }
-        }
-    });
-    
-    deleteBtn.addEventListener('click', () => {
-        if (AppState.currentVideoId) {
-            deleteVideo(AppState.currentVideoId);
-        }
-    });
-    
-    // Compteur de vues (30 secondes)
-    let viewTimer = null;
-    videoElement.addEventListener('play', function() {
-        if (AppState.currentVideoId && AppState.currentUser) {
-            viewTimer = setTimeout(() => {
-                countView(AppState.currentVideoId);
-            }, 30000); // 30 secondes
-        }
-    });
-    
-    videoElement.addEventListener('pause', function() {
-        if (viewTimer) {
-            clearTimeout(viewTimer);
-        }
-    });
-}
-
-function loadVideo(videoId) {
-    const video = AppState.videos.find(v => v.id === videoId);
-    if (!video) return;
-    
-    AppState.currentVideoId = videoId;
-    
-    const videoElement = document.getElementById('video-element');
-    const noVideo = document.getElementById('no-video');
-    const videoTitle = document.getElementById('current-video-title');
-    const videoViews = document.getElementById('video-views');
-    const videoDate = document.getElementById('video-date');
-    const videoAuthor = document.getElementById('video-author');
-    const likeBtn = document.getElementById('like-btn');
-    const likeCount = document.getElementById('like-count');
-    const deleteBtn = document.getElementById('delete-video-btn');
-    const subscribeBtn = document.getElementById('subscribe-btn');
-    
-    // Mettre à jour le lecteur
-    videoElement.src = video.url;
-    videoElement.style.display = 'block';
-    noVideo.style.display = 'none';
-    
-    // Mettre à jour les infos
-    videoTitle.textContent = video.title;
-    videoViews.innerHTML = `<i class="fas fa-eye"></i> ${video.views || 0} vues`;
-    videoDate.textContent = video.uploadDate || '-';
-    videoAuthor.textContent = video.author || '-';
-    
-    // Mettre à jour les likes
-    const isLiked = AppState.likes[videoId] || false;
-    likeBtn.innerHTML = isLiked ? 
-        `<i class="fas fa-heart"></i> <span id="like-count">${isLiked ? 1 : 0}</span>` : 
-        `<i class="far fa-heart"></i> <span id="like-count">0</span>`;
-    likeBtn.style.color = isLiked ? '#e53935' : '';
-    
-    // Afficher/masquer les boutons
-    const isOwner = AppState.currentUser && 
-                   (video.authorId === AppState.currentUser.id || AppState.currentUser.username === 'admin');
-    const isSubscribed = AppState.currentUser && 
-                        AppState.subscriptions[AppState.currentUser.id]?.includes(video.author);
-    
-    deleteBtn.style.display = isOwner ? 'inline-flex' : 'none';
-    subscribeBtn.style.display = AppState.currentUser && !isOwner ? 'inline-flex' : 'none';
-    subscribeBtn.innerHTML = isSubscribed ? 
-        '<i class="fas fa-user-check"></i> Abonné' : 
-        '<i class="fas fa-user-plus"></i> S\'abonner';
-    
-    // Charger les commentaires
-    renderComments(videoId);
-    
-    // Ajouter à l'historique
-    addToHistory(videoId);
-    
-    // Lire la vidéo
-    videoElement.play().catch(e => {
-        console.log('Lecture automatique bloquée');
-    });
-}
-
-function countView(videoId) {
-    const video = AppState.videos.find(v => v.id === videoId);
-    if (!video) return;
-    
-    // Vérifier si déjà compté aujourd'hui
-    const today = new Date().toDateString();
-    const viewKey = `${videoId}_${AppState.currentUser?.id || 'anonymous'}_${today}`;
-    
-    if (AppState.views[viewKey]) return;
-    
-    // Incrémenter les vues
-    video.views = (video.views || 0) + 1;
-    AppState.views[viewKey] = true;
-    
-    // Sauvegarder
-    localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
-    localStorage.setItem('animeRefViews', JSON.stringify(AppState.views));
-    
-    // Mettre à jour l'affichage
-    document.getElementById('video-views').innerHTML = `<i class="fas fa-eye"></i> ${video.views} vues`;
-    
-    // Mettre à jour la bibliothèque
-    renderLibrary();
-}
-
-function addToHistory(videoId) {
-    if (!AppState.currentUser) return;
-    
-    const video = AppState.videos.find(v => v.id === videoId);
-    if (!video) return;
-    
-    // Supprimer l'entrée existante si elle existe
-    AppState.history = AppState.history.filter(entry => 
-        !(entry.videoId === videoId && entry.userId === AppState.currentUser.id)
-    );
-    
-    // Ajouter la nouvelle entrée
-    const historyEntry = {
-        videoId: videoId,
-        userId: AppState.currentUser.id,
-        title: video.title,
-        author: video.author,
-        date: new Date().toLocaleString('fr-FR'),
-        timestamp: Date.now()
-    };
-    
-    AppState.history.unshift(historyEntry);
-    
-    // Limiter à 50 entrées
-    if (AppState.history.length > 50) {
-        AppState.history.pop();
-    }
-    
-    // Sauvegarder
-    localStorage.setItem('animeRefHistory', JSON.stringify(AppState.history));
-    
-    // Mettre à jour l'affichage
-    renderHistory();
-}
-
-// ==================== UPLOAD ====================
-function initUpload() {
-    // Étape 1: Sélection du fichier
-    document.getElementById('video-file').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            AppState.currentVideoFile = file;
-            
-            // Afficher les infos du fichier
-            document.getElementById('file-info').style.display = 'block';
-            document.getElementById('file-name').textContent = file.name;
-            document.getElementById('file-size').textContent = formatFileSize(file.size);
-            
-            // Activer le bouton suivant
-            document.getElementById('step1-next').disabled = false;
-        }
-    });
-    
-    // Navigation des étapes
-    document.getElementById('step1-next').addEventListener('click', goToStep2);
-    document.getElementById('step2-back').addEventListener('click', goToStep1);
-    document.getElementById('step2-next').addEventListener('click', goToStep3);
-    document.getElementById('step3-back').addEventListener('click', goToStep2);
-    document.getElementById('submit-video').addEventListener('click', uploadVideo);
-    
-    // Vérification copyright
-    document.getElementById('copyright-agree').addEventListener('change', function() {
-        document.getElementById('submit-video').disabled = !this.checked;
-    });
-}
-
-function goToStep2() {
-    AppState.uploadStep = 2;
-    updateUploadUI();
-}
-
-function goToStep1() {
-    AppState.uploadStep = 1;
-    updateUploadUI();
-}
-
-function goToStep3() {
-    const title = document.getElementById('video-title').value;
-    const description = document.getElementById('video-description').value;
-    
-    if (!title.trim()) {
-        showMessage('Veuillez donner un titre à votre vidéo', 'error');
-        return;
-    }
-    
-    // Vérification copyright
-    const hasCopyright = checkForCopyright(title + ' ' + description);
-    
-    if (hasCopyright) {
-        document.getElementById('copyright-result').innerHTML = `
-            <div class="message error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <strong>ATTENTION : Contenu protégé détecté</strong>
-                <p>Votre vidéo semble contenir des références à du contenu protégé.</p>
-                <p>Assurez-vous qu'il s'agit de votre création originale.</p>
-            </div>
-        `;
-    } else {
-        document.getElementById('copyright-result').innerHTML = `
-            <div class="message success">
-                <i class="fas fa-check-circle"></i>
-                <strong>Aucun contenu protégé détecté</strong>
-                <p>Votre vidéo peut être publiée.</p>
-            </div>
-        `;
-    }
-    
-    AppState.uploadStep = 3;
-    updateUploadUI();
-}
-
-function updateUploadUI() {
-    // Masquer toutes les étapes
-    document.getElementById('step1').style.display = 'none';
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('step3').style.display = 'none';
-    
-    // Afficher l'étape courante
-    document.getElementById(`step${AppState.uploadStep}`).style.display = 'block';
-    
-    // Mettre à jour les indicateurs
-    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-        indicator.classList.remove('active', 'completed');
-        
-        if (index + 1 < AppState.uploadStep) {
-            indicator.classList.add('completed');
-        } else if (index + 1 === AppState.uploadStep) {
-            indicator.classList.add('active');
-        }
-    });
-}
-
-function checkForCopyright(text) {
-    const lowerText = text.toLowerCase();
-    const copyrightTerms = [
-        'crunchyroll', 'netflix', 'disney', 'hulu', 'amazon prime',
-        'épisode', 'saison', 'vf', 'vostfr', 'streaming',
-        'attack on titan', 'naruto', 'one piece', 'dragon ball',
-        'studio ghibli', 'toei animation'
-    ];
-    
-    return copyrightTerms.some(term => lowerText.includes(term));
-}
-
-function uploadVideo() {
-    if (!AppState.currentUser) {
-        showMessage('Connectez-vous pour uploader une vidéo', 'error');
-        showModal('login-modal');
-        return;
-    }
-    
-    const title = document.getElementById('video-title').value;
-    const description = document.getElementById('video-description').value;
-    const file = AppState.currentVideoFile;
-    
-    // Créer l'URL de la vidéo
-    const videoURL = URL.createObjectURL(file);
-    const videoId = 'video_' + Date.now();
-    
-    // Créer l'objet vidéo
-    const video = {
-        id: videoId,
-        title: title || 'Vidéo sans titre',
-        description: description,
-        url: videoURL,
-        authorId: AppState.currentUser.id,
-        author: AppState.currentUser.username,
-        views: 0,
-        likes: 0,
-        uploadDate: new Date().toLocaleDateString('fr-FR'),
-        timestamp: Date.now(),
-        fileName: file.name,
-        fileSize: file.size,
-        isOriginal: true
-    };
-    
-    // Ajouter aux vidéos
-    AppState.videos.unshift(video);
-    
-    // Ajouter aux vidéos de l'utilisateur
-    if (!AppState.currentUser.videos) {
-        AppState.currentUser.videos = [];
-    }
-    AppState.currentUser.videos.push(videoId);
-    
-    // Mettre à jour l'utilisateur
-    AppState.users[AppState.currentUser.username] = AppState.currentUser;
-    
-    // Sauvegarder
-    localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
-    localStorage.setItem('animeRefUsers', JSON.stringify(AppState.users));
-    localStorage.setItem('animeRefUser', JSON.stringify(AppState.currentUser));
-    
-    // Réinitialiser le formulaire
-    resetUploadForm();
-    
-    // Mettre à jour l'interface
-    renderLibrary();
-    renderMyVideos();
+    // Mettre à jour les informations de la vidéo
+    document.getElementById('videoModalTitle').textContent = video.title;
+    document.getElementById('videoModalViews').textContent = `${video.views} vues`;
+    document.getElementById('videoModalDate').textContent = video.date;
+    document.getElementById('videoModalDescription').textContent = video.description;
     
     // Charger la vidéo
-    loadVideo(videoId);
+    player.src = videoSource;
     
-    // Retour à l'accueil
-    showSection('home-section');
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById('nav-home').classList.add('active');
+    // Ajouter à l'historique
+    addToHistory(video);
     
-    showMessage('Vidéo publiée avec succès !', 'success');
+    // Afficher le modal
+    modal.style.display = 'flex';
+    
+    // Lecture automatique
+    setTimeout(() => {
+        player.play().catch(e => console.log("Lecture automatique bloquée"));
+    }, 500);
+}
+
+// Fermer modal vidéo
+function closeVideoModal() {
+    const modal = document.getElementById('videoModal');
+    const player = document.getElementById('videoPlayer');
+    
+    player.pause();
+    modal.style.display = 'none';
+}
+
+// Ajouter à l'historique
+function addToHistory(video) {
+    // Vérifier si la vidéo est déjà dans l'historique
+    const existingIndex = watchHistory.findIndex(item => item.id === video.id);
+    
+    if (existingIndex !== -1) {
+        watchHistory.splice(existingIndex, 1);
+    }
+    
+    // Ajouter en premier avec la date actuelle
+    const historyItem = {
+        ...video,
+        watchedAt: new Date().toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    };
+    
+    watchHistory.unshift(historyItem);
+    
+    // Limiter à 50 éléments
+    if (watchHistory.length > 50) {
+        watchHistory.pop();
+    }
+    
+    // Sauvegarder dans localStorage
+    localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
+    
+    // Recharger l'historique
+    loadWatchHistory();
+}
+
+// Upload de vidéo - Gestion des étapes
+function openUploadModal() {
+    // Vérifier si l'utilisateur est connecté
+    if (!currentUser) {
+        showNotification("Vous devez être connecté pour uploader une vidéo");
+        openAuthModal();
+        return;
+    }
+    
+    const modal = document.getElementById('uploadModal');
+    modal.style.display = 'flex';
+    resetUploadForm();
+}
+
+function closeUploadModal() {
+    const modal = document.getElementById('uploadModal');
+    modal.style.display = 'none';
 }
 
 function resetUploadForm() {
-    AppState.uploadStep = 1;
-    AppState.currentVideoFile = null;
+    uploadStep = 1;
+    selectedFile = null;
+    
+    // Réinitialiser les étapes
+    document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+    });
+    document.getElementById('step1').classList.add('active');
+    
+    // Réinitialiser les contenus d'étape
+    document.querySelectorAll('.upload-step-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById('uploadStep1').classList.add('active');
     
     // Réinitialiser les champs
-    document.getElementById('upload-form').reset();
-    document.getElementById('file-info').style.display = 'none';
-    document.getElementById('copyright-result').innerHTML = '';
-    document.getElementById('copyright-agree').checked = false;
+    document.getElementById('videoFile').value = '';
+    document.getElementById('videoTitle').value = '';
+    document.getElementById('videoDescription').value = '';
+    document.getElementById('videoTags').value = '';
+    document.getElementById('fileInfo').innerHTML = '';
     
-    updateUploadUI();
+    // Désactiver les boutons
+    document.querySelector('.next-step-btn').disabled = true;
+    document.querySelector('.upload-submit-btn').disabled = true;
 }
 
-// ==================== BIBLIOTHÈQUE ====================
-function renderLibrary() {
-    const libraryGrid = document.getElementById('library-grid');
+function nextUploadStep() {
+    if (uploadStep >= 3) return;
     
-    if (AppState.videos.length === 0) {
-        libraryGrid.innerHTML = '<p class="empty-message">Aucune vidéo importée.</p>';
+    // Valider l'étape actuelle
+    if (uploadStep === 1 && !selectedFile) {
+        showNotification("Veuillez sélectionner un fichier vidéo");
         return;
     }
     
-    libraryGrid.innerHTML = '';
+    if (uploadStep === 2) {
+        const title = document.getElementById('videoTitle').value.trim();
+        if (!title) {
+            showNotification("Veuillez entrer un titre pour la vidéo");
+            return;
+        }
+    }
     
-    AppState.videos.forEach(video => {
-        const videoCard = createVideoCard(video);
-        libraryGrid.appendChild(videoCard);
+    uploadStep++;
+    updateUploadSteps();
+}
+
+function prevUploadStep() {
+    if (uploadStep <= 1) return;
+    uploadStep--;
+    updateUploadSteps();
+}
+
+function updateUploadSteps() {
+    // Mettre à jour les indicateurs d'étape
+    document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
     });
-}
-
-function renderMyVideos() {
-    const myVideosGrid = document.getElementById('my-videos-grid');
-    if (!myVideosGrid) return;
+    document.getElementById(`step${uploadStep}`).classList.add('active');
     
-    if (!AppState.currentUser) {
-        myVideosGrid.innerHTML = '<p class="empty-message">Connectez-vous pour voir vos vidéos.</p>';
-        return;
-    }
-    
-    const userVideos = AppState.videos.filter(v => v.authorId === AppState.currentUser.id);
-    
-    if (userVideos.length === 0) {
-        myVideosGrid.innerHTML = '<p class="empty-message">Vous n\'avez pas encore uploadé de vidéos.</p>';
-        return;
-    }
-    
-    myVideosGrid.innerHTML = '';
-    
-    userVideos.forEach(video => {
-        const videoCard = createVideoCard(video, true);
-        myVideosGrid.appendChild(videoCard);
+    // Mettre à jour les contenus d'étape
+    document.querySelectorAll('.upload-step-content').forEach(content => {
+        content.classList.remove('active');
     });
+    document.getElementById(`uploadStep${uploadStep}`).classList.add('active');
+    
+    // Si on est à l'étape 3, lancer la vérification
+    if (uploadStep === 3) {
+        startVerification();
+    }
 }
 
-function createVideoCard(video, showDelete = false) {
-    const videoCard = document.createElement('div');
-    videoCard.className = 'video-card';
-    videoCard.dataset.id = video.id;
+// Gestion du fichier
+document.getElementById('videoFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
     
-    videoCard.innerHTML = `
-        <div class="video-thumbnail">
-            <i class="fas fa-play-circle"></i>
-        </div>
-        <div class="video-card-content">
-            <div class="video-card-title">${video.title}</div>
-            <div class="video-card-author">Par ${video.author}</div>
-            <div class="video-card-details">
-                <span><i class="fas fa-eye"></i> ${video.views || 0}</span>
-                <span>${video.uploadDate || ''}</span>
-            </div>
-            ${showDelete ? `
-                <div class="video-card-actions">
-                    <button onclick="deleteVideo('${video.id}')" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            ` : ''}
-        </div>
+    // Vérifier le type de fichier
+    const validTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'];
+    if (!validTypes.includes(file.type)) {
+        showNotification("Format de fichier non supporté. Utilisez MP4, AVI, MOV, WMV ou FLV.");
+        return;
+    }
+    
+    // Vérifier la taille (max 2GB)
+    if (file.size > 2 * 1024 * 1024 * 1024) {
+        showNotification("Le fichier est trop volumineux (max 2GB)");
+        return;
+    }
+    
+    selectedFile = file;
+    
+    // Afficher les infos du fichier
+    const fileInfoDiv = document.getElementById('fileInfo');
+    fileInfoDiv.innerHTML = `
+        <p><strong>Fichier sélectionné:</strong> ${file.name}</p>
+        <p><strong>Taille:</strong> ${formatFileSize(file.size)}</p>
+        <p><strong>Type:</strong> ${file.type}</p>
     `;
     
-    videoCard.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('btn-danger')) {
-            loadVideo(video.id);
-            showSection('home-section');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById('nav-home').classList.add('active');
-        }
-    });
+    // Activer le bouton suivant
+    document.querySelector('.next-step-btn').disabled = false;
     
-    return videoCard;
-}
-
-// ==================== HISTORIQUE ====================
-function renderHistory() {
-    const historyList = document.getElementById('history-list');
+    // Pré-remplir le titre avec le nom du fichier
+    const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+    document.getElementById('videoTitle').value = fileNameWithoutExt;
     
-    if (!AppState.currentUser || AppState.history.length === 0) {
-        historyList.innerHTML = '<p class="empty-message">Aucune vidéo visionnée.</p>';
-        return;
-    }
-    
-    // Filtrer l'historique de l'utilisateur
-    const userHistory = AppState.history
-        .filter(entry => entry.userId === AppState.currentUser.id)
-        .slice(0, 20); // Limiter à 20 entrées
-    
-    if (userHistory.length === 0) {
-        historyList.innerHTML = '<p class="empty-message">Aucune vidéo visionnée.</p>';
-        return;
-    }
-    
-    historyList.innerHTML = '';
-    
-    userHistory.forEach(entry => {
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        
-        historyItem.innerHTML = `
-            <div class="history-thumbnail-small">
-                <i class="fas fa-play-circle"></i>
-            </div>
-            <div class="history-info">
-                <div class="history-title">${entry.title}</div>
-                <div class="history-details">
-                    <span>${entry.author}</span>
-                    <span>•</span>
-                    <span>${entry.date}</span>
-                </div>
-            </div>
-        `;
-        
-        historyItem.addEventListener('click', () => {
-            const video = AppState.videos.find(v => v.id === entry.videoId);
-            if (video) {
-                loadVideo(video.id);
-                showSection('home-section');
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                document.getElementById('nav-home').classList.add('active');
-            }
-        });
-        
-        historyList.appendChild(historyItem);
-    });
-}
-
-// ==================== COMMENTAIRES ====================
-function initComments() {
-    const submitBtn = document.getElementById('submit-comment');
-    const commentInput = document.getElementById('comment-input');
-    
-    if (submitBtn && commentInput) {
-        submitBtn.addEventListener('click', addComment);
-        commentInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addComment();
-        });
-    }
-}
-
-function addComment() {
-    if (!AppState.currentUser) {
-        showMessage('Connectez-vous pour commenter', 'error');
-        showModal('login-modal');
-        return;
-    }
-    
-    if (!AppState.currentVideoId) {
-        showMessage('Sélectionnez d\'abord une vidéo', 'error');
-        return;
-    }
-    
-    const text = document.getElementById('comment-input').value.trim();
-    if (!text) return;
-    
-    // Initialiser les commentaires pour cette vidéo
-    if (!AppState.comments[AppState.currentVideoId]) {
-        AppState.comments[AppState.currentVideoId] = [];
-    }
-    
-    const comment = {
-        id: 'comment_' + Date.now(),
-        author: AppState.currentUser.username,
-        text: text,
-        date: new Date().toLocaleString('fr-FR')
-    };
-    
-    AppState.comments[AppState.currentVideoId].unshift(comment);
-    localStorage.setItem('animeRefComments', JSON.stringify(AppState.comments));
-    
-    // Réinitialiser le champ
-    document.getElementById('comment-input').value = '';
-    
-    // Mettre à jour l'affichage
-    renderComments(AppState.currentVideoId);
-    showMessage('Commentaire publié', 'success');
-}
-
-function renderComments(videoId) {
-    const commentsList = document.getElementById('comments-list');
-    const comments = AppState.comments[videoId] || [];
-    
-    if (comments.length === 0) {
-        commentsList.innerHTML = '<p class="empty-message">Aucun commentaire. Soyez le premier !</p>';
-        return;
-    }
-    
-    commentsList.innerHTML = '';
-    
-    comments.forEach(comment => {
-        const commentElement = document.createElement('div');
-        commentElement.className = 'comment-item';
-        
-        commentElement.innerHTML = `
-            <div class="comment-author">${comment.author}</div>
-            <div class="comment-date">${comment.date}</div>
-            <div class="comment-text">${comment.text}</div>
-        `;
-        
-        commentsList.appendChild(commentElement);
-    });
-}
-
-// ==================== LIKES ====================
-function toggleLike(videoId) {
-    if (!AppState.currentUser) {
-        showMessage('Connectez-vous pour aimer une vidéo', 'error');
-        showModal('login-modal');
-        return;
-    }
-    
-    AppState.likes[videoId] = !AppState.likes[videoId];
-    localStorage.setItem('animeRefLikes', JSON.stringify(AppState.likes));
-    
-    const likeBtn = document.getElementById('like-btn');
-    const likeCount = document.getElementById('like-count');
-    const isLiked = AppState.likes[videoId];
-    
-    likeBtn.innerHTML = isLiked ? 
-        `<i class="fas fa-heart"></i> <span id="like-count">1</span>` : 
-        `<i class="far fa-heart"></i> <span id="like-count">0</span>`;
-    likeBtn.style.color = isLiked ? '#e53935' : '';
-    
-    showMessage(isLiked ? 'Vidéo aimée !' : 'Vidéo désaimée', 'info');
-}
-
-// ==================== ABONNEMENTS ====================
-function toggleSubscription(author) {
-    if (!AppState.currentUser) {
-        showMessage('Connectez-vous pour vous abonner', 'error');
-        showModal('login-modal');
-        return;
-    }
-    
-    const userId = AppState.currentUser.id;
-    
-    // Initialiser les abonnements
-    if (!AppState.subscriptions[userId]) {
-        AppState.subscriptions[userId] = [];
-    }
-    
-    const isSubscribed = AppState.subscriptions[userId].includes(author);
-    
-    if (isSubscribed) {
-        // Se désabonner
-        AppState.subscriptions[userId] = AppState.subscriptions[userId].filter(a => a !== author);
-        showMessage(`Désabonné de ${author}`, 'info');
-    } else {
-        // S'abonner
-        AppState.subscriptions[userId].push(author);
-        showMessage(`Abonné à ${author} !`, 'success');
-    }
-    
-    localStorage.setItem('animeRefSubs', JSON.stringify(AppState.subscriptions));
-    
-    // Mettre à jour le bouton
-    const subscribeBtn = document.getElementById('subscribe-btn');
-    if (subscribeBtn) {
-        subscribeBtn.innerHTML = isSubscribed ? 
-            '<i class="fas fa-user-plus"></i> S\'abonner' : 
-            '<i class="fas fa-user-check"></i> Abonné';
-    }
-    
-    renderSubscriptions();
-}
-
-function renderSubscriptions() {
-    const subscriptionsList = document.getElementById('subscriptions-list');
-    if (!subscriptionsList) return;
-    
-    if (!AppState.currentUser) {
-        subscriptionsList.innerHTML = '<p class="empty-message">Connectez-vous pour voir vos abonnements.</p>';
-        return;
-    }
-    
-    const userSubs = AppState.subscriptions[AppState.currentUser.id] || [];
-    
-    if (userSubs.length === 0) {
-        subscriptionsList.innerHTML = '<p class="empty-message">Vous n\'êtes abonné à personne.</p>';
-        return;
-    }
-    
-    subscriptionsList.innerHTML = '';
-    
-    userSubs.forEach(author => {
-        const user = AppState.users[author];
-        if (!user) return;
-        
-        const subItem = document.createElement('div');
-        subItem.className = 'subscription-item';
-        
-        subItem.innerHTML = `
-            <div class="avatar">
-                ${author.charAt(0).toUpperCase()}
-            </div>
-            <div class="subscription-info">
-                <div class="subscription-name">${author}</div>
-                <div class="subscription-stats">${user.videos?.length || 0} vidéos</div>
-            </div>
-            <button onclick="unsubscribe('${author}')" class="btn btn-danger btn-sm">
-                <i class="fas fa-user-minus"></i>
-            </button>
-        `;
-        
-        subscriptionsList.appendChild(subItem);
-    });
-}
-
-function unsubscribe(author) {
-    if (!AppState.currentUser) return;
-    
-    const userId = AppState.currentUser.id;
-    if (AppState.subscriptions[userId]) {
-        AppState.subscriptions[userId] = AppState.subscriptions[userId].filter(a => a !== author);
-        localStorage.setItem('animeRefSubs', JSON.stringify(AppState.subscriptions));
-        renderSubscriptions();
-        showMessage(`Désabonné de ${author}`, 'info');
-    }
-}
-
-// ==================== RECHERCHE ====================
-function initSearch() {
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    
-    if (searchInput && searchBtn) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
-        
-        searchBtn.addEventListener('click', performSearch);
-    }
-}
-
-function performSearch() {
-    const query = document.getElementById('search-input').value.toLowerCase().trim();
-    if (!query) return;
-    
-    const results = AppState.videos.filter(video => 
-        video.title.toLowerCase().includes(query) || 
-        video.description?.toLowerCase().includes(query) ||
-        video.author.toLowerCase().includes(query)
-    );
-    
-    if (results.length === 0) {
-        showMessage('Aucun résultat trouvé', 'info');
-        return;
-    }
-    
-    // Afficher les résultats
-    const libraryGrid = document.getElementById('library-grid');
-    libraryGrid.innerHTML = '';
-    
-    results.forEach(video => {
-        const videoCard = createVideoCard(video);
-        libraryGrid.appendChild(videoCard);
-    });
-    
-    // Aller à la bibliothèque
-    showSection('library-section');
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById('nav-library').classList.add('active');
-}
-
-// ==================== DONS ====================
-function initDonations() {
-    const donateBtn = document.getElementById('donate-btn');
-    const sidebarDonate = document.getElementById('sidebar-donate');
-    const confirmDonate = document.getElementById('confirm-donate');
-    
-    if (donateBtn) {
-        donateBtn.addEventListener('click', () => showModal('donate-modal'));
-    }
-    
-    if (sidebarDonate) {
-        sidebarDonate.addEventListener('click', () => showModal('donate-modal'));
-    }
-    
-    if (confirmDonate) {
-        confirmDonate.addEventListener('click', processDonation);
-    }
-}
-
-function processDonation() {
-    const amount = document.getElementById('donate-amount').value;
-    const method = document.getElementById('donate-method').value;
-    
-    if (!amount || amount < 1) {
-        showMessage('Veuillez entrer un montant valide', 'error');
-        return;
-    }
-    
-    let message = `Merci pour votre don de ${amount}€ !\n\n`;
-    
-    if (method === 'mobile') {
-        message += `📱 Envoyez ${amount}€ au : 07 09 65 63 59\n`;
-        message += `💸 L'argent arrivera directement sur mon téléphone`;
-    } else if (method === 'paypal') {
-        message += `💳 PayPal : jitihh700@gmail.com\n`;
-        message += `💰 Mentionnez "ANIMEREF" dans le message`;
-    }
-    
-    alert(message);
-    closeModal('donate-modal');
-    
-    // Réinitialiser
-    document.getElementById('donate-amount').value = '5';
-    
-    showMessage('Merci pour votre soutien ! ❤️', 'success');
-}
-
-// ==================== SIDEBAR ====================
-function initSidebar() {
-    // Admin toggle
-    document.getElementById('admin-toggle').addEventListener('click', function() {
-        if (AppState.currentUser?.username === 'admin') {
-            AppState.currentUser.isAdmin = !AppState.currentUser.isAdmin;
-            localStorage.setItem('animeRefUser', JSON.stringify(AppState.currentUser));
-            
-            const adminText = document.getElementById('admin-text');
-            adminText.textContent = AppState.currentUser.isAdmin ? 'Admin (ON)' : 'Mode Admin';
-            adminText.parentElement.style.color = AppState.currentUser.isAdmin ? '#f47521' : '';
-            
-            showMessage(AppState.currentUser.isAdmin ? 'Mode admin activé' : 'Mode admin désactivé', 'success');
-            updateUI();
-        } else {
-            showMessage('Seul l\'administrateur peut activer ce mode', 'error');
-        }
-    });
-    
-    // Mes vidéos
-    document.getElementById('my-videos-btn').addEventListener('click', function() {
-        if (!AppState.currentUser) {
-            showMessage('Connectez-vous pour voir vos vidéos', 'error');
-            showModal('login-modal');
-            return;
-        }
-        
-        showSection('my-videos-section');
-        renderMyVideos();
-        
-        // Mettre à jour la navigation
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    });
-    
-    // Abonnements
-    document.getElementById('subscriptions-btn').addEventListener('click', function() {
-        if (!AppState.currentUser) {
-            showMessage('Connectez-vous pour voir vos abonnements', 'error');
-            showModal('login-modal');
-            return;
-        }
-        
-        showSection('subscriptions-section');
-        renderSubscriptions();
-        
-        // Mettre à jour la navigation
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    });
-    
-    // Vider l'historique
-    document.getElementById('clear-history-btn').addEventListener('click', function() {
-        if (!AppState.currentUser) {
-            showMessage('Connectez-vous pour gérer votre historique', 'error');
-            return;
-        }
-        
-        if (confirm('Voulez-vous vraiment vider tout votre historique ?')) {
-            AppState.history = AppState.history.filter(entry => entry.userId !== AppState.currentUser.id);
-            localStorage.setItem('animeRefHistory', JSON.stringify(AppState.history));
-            renderHistory();
-            showMessage('Historique vidé', 'success');
-        }
-    });
-}
-
-// ==================== UTILITAIRES ====================
-function deleteVideo(videoId) {
-    const video = AppState.videos.find(v => v.id === videoId);
-    if (!video) return;
-    
-    const isOwner = AppState.currentUser && 
-                   (video.authorId === AppState.currentUser.id || AppState.currentUser.isAdmin);
-    
-    if (!isOwner) {
-        showMessage('Vous ne pouvez pas supprimer cette vidéo', 'error');
-        return;
-    }
-    
-    if (!confirm('Voulez-vous vraiment supprimer cette vidéo ?')) {
-        return;
-    }
-    
-    // Libérer l'URL
-    URL.revokeObjectURL(video.url);
-    
-    // Supprimer
-    AppState.videos = AppState.videos.filter(v => v.id !== videoId);
-    localStorage.setItem('animeRefVideos', JSON.stringify(AppState.videos));
-    
-    // Si c'était la vidéo en cours
-    if (AppState.currentVideoId === videoId) {
-        const videoElement = document.getElementById('video-element');
-        const noVideo = document.getElementById('no-video');
-        
-        videoElement.src = '';
-        videoElement.style.display = 'none';
-        noVideo.style.display = 'flex';
-        document.getElementById('current-video-title').textContent = 'Aucune vidéo sélectionnée';
-        AppState.currentVideoId = null;
-    }
-    
-    // Mettre à jour
-    renderLibrary();
-    renderMyVideos();
-    
-    showMessage('Vidéo supprimée', 'success');
-}
-
-function updateUI() {
-    const authSection = document.getElementById('auth-section');
-    const userSection = document.getElementById('user-section');
-    const usernameDisplay = document.getElementById('username-display');
-    
-    if (AppState.currentUser) {
-        authSection.style.display = 'none';
-        userSection.style.display = 'flex';
-        usernameDisplay.textContent = AppState.currentUser.username;
-        
-        // Afficher les éléments réservés aux utilisateurs connectés
-        document.querySelectorAll('.user-only').forEach(el => {
-            el.style.display = 'block';
-        });
-        
-        // Mettre à jour le texte admin
-        const adminText = document.getElementById('admin-text');
-        if (adminText) {
-            adminText.textContent = AppState.currentUser.isAdmin ? 'Admin (ON)' : 'Mode Admin';
-            adminText.parentElement.style.color = AppState.currentUser.isAdmin ? '#f47521' : '';
-        }
-    } else {
-        authSection.style.display = 'flex';
-        userSection.style.display = 'none';
-        
-        // Masquer les éléments réservés aux utilisateurs connectés
-        document.querySelectorAll('.user-only').forEach(el => {
-            el.style.display = 'none';
-        });
-    }
-}
+    // Mettre à jour le résumé
+    document.getElementById('summaryFile').textContent = file.name;
+    document.getElementById('summaryTitle').textContent = fileNameWithoutExt;
+});
 
 function formatFileSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-    if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
-    return (bytes / 1073741824).toFixed(1) + ' GB';
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function showModal(modalId) {
-    document.getElementById(modalId).style.display = 'flex';
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-
-function showMessage(text, type) {
-    // Supprimer les messages existants
-    const existingMessages = document.querySelectorAll('.message.temporary');
-    existingMessages.forEach(msg => msg.remove());
+// Vérification des droits d'auteur
+function startVerification() {
+    const progressBar = document.getElementById('verificationProgress');
+    const progressText = document.getElementById('progressText');
+    const statusText = document.getElementById('verificationStatus');
+    const submitBtn = document.querySelector('.upload-submit-btn');
     
-    // Créer le message
-    const message = document.createElement('div');
-    message.className = `message ${type} temporary`;
-    message.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 
-                         type === 'error' ? 'exclamation-circle' : 
-                         'info-circle'}"></i>
-        ${text}
-    `;
-    message.style.position = 'fixed';
-    message.style.top = '20px';
-    message.style.right = '20px';
-    message.style.zIndex = '1000';
-    message.style.padding = '15px 20px';
-    message.style.borderRadius = '8px';
-    message.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-    message.style.animation = 'slideIn 0.3s ease-out';
+    // Mettre à jour le résumé
+    const title = document.getElementById('videoTitle').value;
+    const visibility = document.querySelector('input[name="visibility"]:checked').value;
+    const visibilityText = {
+        'public': 'Public',
+        'private': 'Privé',
+        'unlisted': 'Non listé'
+    }[visibility];
     
-    document.body.appendChild(message);
+    document.getElementById('summaryTitle').textContent = title;
+    document.getElementById('summaryVisibility').textContent = visibilityText;
     
-    // Supprimer après 3 secondes
-    setTimeout(() => {
-        if (message.parentNode) {
-            message.style.animation = 'slideOut 0.3s ease-in';
-            setTimeout(() => message.remove(), 300);
+    // Simuler la vérification des droits d'auteur
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 5;
+        progressBar.style.width = `${progress}%`;
+        progressText.textContent = `${progress}%`;
+        
+        if (progress <= 30) {
+            statusText.textContent = "Vérification des métadonnées...";
+        } else if (progress <= 60) {
+            statusText.textContent = "Analyse du contenu audio...";
+        } else if (progress <= 90) {
+            statusText.textContent = "Recherche de contenu protégé...";
         }
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            progressText.textContent = "100%";
+            statusText.innerHTML = '<span style="color: #4CAF50;">✓ Vérification terminée. Aucun problème de droits d\'auteur détecté.</span>';
+            submitBtn.disabled = false;
+        }
+    }, 100);
+}
+
+// Soumettre la vidéo
+function submitVideo() {
+    const title = document.getElementById('videoTitle').value;
+    const description = document.getElementById('videoDescription').value;
+    const visibility = document.querySelector('input[name="visibility"]:checked').value;
+    
+    // Créer la nouvelle vidéo
+    const newVideo = {
+        id: videos.length + 1,
+        title: title,
+        channel: currentUser.name,
+        views: "0",
+        date: "À l'instant",
+        duration: "00:00",
+        thumbnail: "https://picsum.photos/320/180?random=" + (videos.length + 5),
+        description: description,
+        userId: currentUser.id
+    };
+    
+    // Ajouter aux vidéos
+    videos.unshift(newVideo);
+    myVideos.unshift(newVideo);
+    
+    // Mettre à jour l'interface
+    loadVideos();
+    loadMyVideos();
+    
+    // Fermer le modal
+    closeUploadModal();
+    
+    // Afficher une notification
+    showNotification("Vidéo publiée avec succès!");
+    
+    // Afficher la section "Mes vidéos"
+    showSection('my-videos');
+}
+
+// Authentification
+function openAuthModal() {
+    const modal = document.getElementById('authModal');
+    modal.style.display = 'flex';
+    switchAuthTab('login');
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    modal.style.display = 'none';
+}
+
+function switchAuthTab(tab) {
+    // Mettre à jour les onglets
+    document.querySelectorAll('.auth-tab').forEach(t => {
+        t.classList.remove('active');
+    });
+    
+    if (tab === 'login') {
+        document.querySelectorAll('.auth-tab')[0].classList.add('active');
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('signupForm').style.display = 'none';
+    } else {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'block';
+    }
+}
+
+function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showNotification("Veuillez remplir tous les champs");
+        return;
+    }
+    
+    // Simulation de connexion
+    currentUser = {
+        id: 1,
+        name: "Vous",
+        email: email
+    };
+    
+    // Sauvegarder dans localStorage
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    // Mettre à jour l'interface
+    updateAuthUI();
+    
+    // Fermer le modal
+    closeAuthModal();
+    
+    // Afficher une notification
+    showNotification("Connexion réussie!");
+}
+
+function signup() {
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!name || !email || !password || !confirmPassword) {
+        showNotification("Veuillez remplir tous les champs");
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showNotification("Les mots de passe ne correspondent pas");
+        return;
+    }
+    
+    // Simulation d'inscription
+    currentUser = {
+        id: users.length + 1,
+        name: name,
+        email: email
+    };
+    
+    // Ajouter aux utilisateurs
+    users.push(currentUser);
+    
+    // Sauvegarder dans localStorage
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // Mettre à jour l'interface
+    updateAuthUI();
+    
+    // Fermer le modal
+    closeAuthModal();
+    
+    // Afficher une notification
+    showNotification("Inscription réussie! Bienvenue " + name);
+}
+
+function loginWithGoogle() {
+    // Simulation de connexion Google
+    currentUser = {
+        id: 1,
+        name: "Utilisateur Google",
+        email: "googleuser@exemple.com"
+    };
+    
+    // Sauvegarder dans localStorage
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    // Mettre à jour l'interface
+    updateAuthUI();
+    
+    // Fermer le modal
+    closeAuthModal();
+    
+    // Afficher une notification
+    showNotification("Connexion avec Google réussie!");
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    updateAuthUI();
+    showNotification("Déconnexion réussie");
+}
+
+function checkAuthStatus() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+    }
+    updateAuthUI();
+}
+
+function updateAuthUI() {
+    const signInBtn = document.getElementById('signInBtn');
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    const userNameSpan = document.getElementById('userName');
+    
+    if (currentUser) {
+        signInBtn.style.display = 'none';
+        userProfileBtn.style.display = 'flex';
+        userNameSpan.textContent = currentUser.name;
+        
+        // Ajouter un menu déroulant pour la déconnexion
+        userProfileBtn.onclick = function(e) {
+            const menu = document.createElement('div');
+            menu.className = 'profile-menu';
+            menu.innerHTML = `
+                <div class="profile-menu-item" onclick="showSection('my-videos')">
+                    <i class="fas fa-video"></i> Mes vidéos
+                </div>
+                <div class="profile-menu-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </div>
+            `;
+            menu.style.position = 'absolute';
+            menu.style.top = '60px';
+            menu.style.right = '20px';
+            menu.style.backgroundColor = 'white';
+            menu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            menu.style.borderRadius = '8px';
+            menu.style.padding = '10px 0';
+            menu.style.zIndex = '1000';
+            
+            // Supprimer le menu précédent s'il existe
+            const existingMenu = document.querySelector('.profile-menu');
+            if (existingMenu) existingMenu.remove();
+            
+            document.body.appendChild(menu);
+            
+            // Fermer le menu en cliquant ailleurs
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target) && e.target !== userProfileBtn) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 0);
+        };
+    } else {
+        signInBtn.style.display = 'flex';
+        userProfileBtn.style.display = 'none';
+    }
+}
+
+// Dons
+function openDonateModal() {
+    const modal = document.getElementById('donateModal');
+    modal.style.display = 'flex';
+}
+
+function closeDonateModal() {
+    const modal = document.getElementById('donateModal');
+    modal.style.display = 'none';
+}
+
+function selectDonationAmount(amount) {
+    // Animation de sélection
+    document.querySelectorAll('.donation-amount').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+    
+    // Afficher un message
+    showNotification(`Merci pour votre don de ${amount}€! Contactez-nous par téléphone ou email pour finaliser.`);
+    
+    // Fermer après un délai
+    setTimeout(() => {
+        closeDonateModal();
+    }, 2000);
+}
+
+function processCustomDonation() {
+    const amount = document.getElementById('customAmount').value;
+    if (!amount || amount < 1) {
+        showNotification("Veuillez entrer un montant valide");
+        return;
+    }
+    
+    showNotification(`Merci pour votre don de ${amount}€! Contactez-nous par téléphone ou email pour finaliser.`);
+    closeDonateModal();
+}
+
+// Notification
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    const messageSpan = document.getElementById('notificationMessage');
+    
+    messageSpan.textContent = message;
+    notification.style.display = 'block';
+    
+    // Masquer après 3 secondes
+    setTimeout(() => {
+        notification.style.display = 'none';
     }, 3000);
 }
 
-// Fonctions globales
-window.closeModal = closeModal;
-window.deleteVideo = deleteVideo;
-window.unsubscribe = unsubscribe;
+// Charger les données depuis localStorage
+function loadFromLocalStorage() {
+    const savedVideos = localStorage.getItem('videos');
+    const savedHistory = localStorage.getItem('watchHistory');
+    const savedMyVideos = localStorage.getItem('myVideos');
+    
+    if (savedVideos) videos = JSON.parse(savedVideos);
+    if (savedHistory) watchHistory = JSON.parse(savedHistory);
+    if (savedMyVideos) myVideos = JSON.parse(savedMyVideos);
+}
 
-// Initialiser les commentaires
-initComments();
+// Sauvegarder dans localStorage
+function saveToLocalStorage() {
+    localStorage.setItem('videos', JSON.stringify(videos));
+    localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
+    localStorage.setItem('myVideos', JSON.stringify(myVideos));
+}
+
+// Charger les données au démarrage
+loadFromLocalStorage();
+
+// Sauvegarder périodiquement
+setInterval(saveToLocalStorage, 10000);
