@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube-Like Platform</title>
+    <title>Animeref - Plateforme d'anime</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -14,25 +14,25 @@
         <div class="nav-left">
             <i class="fas fa-bars menu-icon"></i>
             <div class="logo">
-                <i class="fab fa-youtube"></i>
-                <span>TubeVision</span>
+                <i class="fas fa-play-circle"></i>
+                <span>Animeref</span>
             </div>
         </div>
         
         <div class="nav-center">
             <div class="search-bar">
-                <input type="text" placeholder="Rechercher des vidéos...">
-                <button class="search-btn"><i class="fas fa-search"></i></button>
+                <input type="text" id="searchInput" placeholder="Rechercher des anime...">
+                <button class="search-btn" onclick="searchVideos()"><i class="fas fa-search"></i></button>
             </div>
         </div>
         
         <div class="nav-right">
             <button class="upload-btn" onclick="openUploadModal()">
-                <i class="fas fa-upload"></i> Importer
+                <i class="fas fa-upload"></i> Publier
             </button>
             <div class="auth-buttons">
                 <button id="signInBtn" class="signin-btn" onclick="openAuthModal()">
-                    <i class="fas fa-user"></i> Se connecter
+                    <i class="fas fa-user"></i> Connexion
                 </button>
                 <button id="userProfileBtn" class="profile-btn" style="display: none;">
                     <i class="fas fa-user-circle"></i>
@@ -40,7 +40,7 @@
                 </button>
             </div>
             <button class="donate-btn" onclick="openDonateModal()">
-                <i class="fas fa-gift"></i> Dons
+                <i class="fas fa-gift"></i> Soutenir
             </button>
         </div>
     </nav>
@@ -53,13 +53,13 @@
                 <i class="fas fa-home"></i>
                 <span>Accueil</span>
             </div>
-            <div class="sidebar-item" onclick="showSection('explore')">
-                <i class="fas fa-compass"></i>
-                <span>Explorer</span>
+            <div class="sidebar-item" onclick="showSection('trending')">
+                <i class="fas fa-fire"></i>
+                <span>Tendances</span>
             </div>
-            <div class="sidebar-item" onclick="showSection('subscriptions')">
-                <i class="fas fa-newspaper"></i>
-                <span>Abonnements</span>
+            <div class="sidebar-item" onclick="showSection('anime-list')">
+                <i class="fas fa-list"></i>
+                <span>Liste d'anime</span>
             </div>
             <div class="sidebar-item" onclick="showSection('library')">
                 <i class="fas fa-photo-video"></i>
@@ -79,24 +79,24 @@
         <main class="main-content">
             <!-- Section Accueil (par défaut) -->
             <section id="home" class="content-section active">
-                <h2 class="section-title">Accueil - Toutes les vidéos</h2>
+                <h2 class="section-title">Anime Récent</h2>
                 <div class="videos-grid" id="homeVideos">
                     <!-- Les vidéos seront chargées ici dynamiquement -->
                 </div>
             </section>
 
-            <!-- Section Explorer -->
-            <section id="explore" class="content-section">
-                <h2 class="section-title">Explorer</h2>
-                <div class="videos-grid" id="exploreVideos">
+            <!-- Section Tendances -->
+            <section id="trending" class="content-section">
+                <h2 class="section-title">Anime Tendances</h2>
+                <div class="videos-grid" id="trendingVideos">
                     <!-- Les vidéos seront chargées ici dynamiquement -->
                 </div>
             </section>
 
-            <!-- Section Abonnements -->
-            <section id="subscriptions" class="content-section">
-                <h2 class="section-title">Vos abonnements</h2>
-                <div class="videos-grid" id="subscriptionsVideos">
+            <!-- Section Liste d'anime -->
+            <section id="anime-list" class="content-section">
+                <h2 class="section-title">Tous les Anime</h2>
+                <div class="videos-grid" id="animeListVideos">
                     <!-- Les vidéos seront chargées ici dynamiquement -->
                 </div>
             </section>
@@ -113,7 +113,7 @@
                     </div>
                     
                     <div class="library-section">
-                        <h3><i class="fas fa-heart"></i> Vidéos aimées</h3>
+                        <h3><i class="fas fa-heart"></i> Anime aimés</h3>
                         <div class="liked-videos" id="likedVideos">
                             <!-- Vidéos aimées seront listées ici -->
                         </div>
@@ -133,7 +133,7 @@
             <section id="my-videos" class="content-section">
                 <h2 class="section-title">Mes vidéos publiées</h2>
                 <button class="upload-video-btn" onclick="openUploadModal()">
-                    <i class="fas fa-upload"></i> Importer une nouvelle vidéo
+                    <i class="fas fa-upload"></i> Publier un nouvel anime
                 </button>
                 <div class="my-uploaded-videos" id="myUploadedVideos">
                     <!-- Mes vidéos uploadées seront listées ici -->
@@ -148,25 +148,44 @@
             <span class="close-modal" onclick="closeVideoModal()">&times;</span>
             <div class="video-player-container">
                 <video id="videoPlayer" controls>
-                    <source src="" type="video/mp4">
                     Votre navigateur ne supporte pas la lecture de vidéos.
                 </video>
             </div>
             <div class="video-info">
-                <h3 id="videoModalTitle">Titre de la vidéo</h3>
+                <h3 id="videoModalTitle">Titre de l'anime</h3>
                 <div class="video-meta">
                     <span id="videoModalViews">0 vues</span> • 
-                    <span id="videoModalDate">Date de publication</span>
+                    <span id="videoModalDate">Date de publication</span> •
+                    <span id="videoModalEpisode">Épisode 1</span>
                 </div>
                 <div class="video-actions">
-                    <button class="action-btn"><i class="fas fa-thumbs-up"></i> J'aime</button>
-                    <button class="action-btn"><i class="fas fa-thumbs-down"></i> Je n'aime pas</button>
-                    <button class="action-btn"><i class="fas fa-share"></i> Partager</button>
-                    <button class="action-btn" id="saveToPlaylistBtn"><i class="fas fa-plus"></i> Sauvegarder</button>
+                    <button class="action-btn" onclick="likeVideo()"><i class="fas fa-thumbs-up"></i> <span id="likeCount">0</span></button>
+                    <button class="action-btn" onclick="dislikeVideo()"><i class="fas fa-thumbs-down"></i> <span id="dislikeCount">0</span></button>
+                    <button class="action-btn" onclick="shareVideo()"><i class="fas fa-share"></i> Partager</button>
+                    <button class="action-btn delete-btn" onclick="deleteVideo()" style="display: none;"><i class="fas fa-trash"></i> Supprimer</button>
                 </div>
                 <div class="video-description">
                     <h4>Description</h4>
-                    <p id="videoModalDescription">Description de la vidéo...</p>
+                    <p id="videoModalDescription">Description de l'anime...</p>
+                    <p><strong>Publié par:</strong> <span id="videoModalChannel">Utilisateur</span></p>
+                </div>
+                <div class="video-comments">
+                    <h4>Commentaires</h4>
+                    <div class="add-comment">
+                        <input type="text" id="commentInput" placeholder="Ajouter un commentaire...">
+                        <button onclick="addComment()">Commenter</button>
+                    </div>
+                    <div class="comments-list" id="commentsList">
+                        <!-- Commentaires ici -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suggestions de vidéos à droite -->
+            <div class="video-suggestions">
+                <h4>Suggestions</h4>
+                <div class="suggestions-list" id="suggestionsList">
+                    <!-- Suggestions de vidéos -->
                 </div>
             </div>
         </div>
@@ -176,7 +195,7 @@
     <div id="uploadModal" class="modal">
         <div class="modal-content upload-modal-content">
             <span class="close-modal" onclick="closeUploadModal()">&times;</span>
-            <h2>Importer une vidéo</h2>
+            <h2><i class="fas fa-upload"></i> Publier un Anime</h2>
             
             <div class="upload-steps">
                 <div class="step active" id="step1">
@@ -198,9 +217,9 @@
                 <div id="uploadStep1" class="upload-step-content active">
                     <div class="file-upload-area" onclick="document.getElementById('videoFile').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <h3>Sélectionnez votre vidéo</h3>
-                        <p>Glissez-déposez ou cliquez pour choisir un fichier</p>
-                        <p class="file-types">Formats supportés: MP4, AVI, MOV, WMV, FLV</p>
+                        <h3>Sélectionnez votre épisode d'anime</h3>
+                        <p>Glissez-déposez ou cliquez pour choisir un fichier vidéo</p>
+                        <p class="file-types">Formats supportés: MP4, MKV, AVI, MOV</p>
                         <input type="file" id="videoFile" accept="video/*" hidden>
                     </div>
                     <div id="fileInfo" class="file-info">
@@ -212,24 +231,31 @@
                 <!-- Étape 2: Informations de la vidéo -->
                 <div id="uploadStep2" class="upload-step-content">
                     <div class="form-group">
-                        <label for="videoTitle">Titre de la vidéo *</label>
-                        <input type="text" id="videoTitle" placeholder="Donnez un titre à votre vidéo">
+                        <label for="videoTitle">Titre de l'anime *</label>
+                        <input type="text" id="videoTitle" placeholder="Ex: Naruto Shippuden">
+                    </div>
+                    <div class="form-group">
+                        <label for="videoEpisode">Numéro d'épisode *</label>
+                        <input type="number" id="videoEpisode" placeholder="Ex: 3" min="1">
                     </div>
                     <div class="form-group">
                         <label for="videoDescription">Description</label>
-                        <textarea id="videoDescription" rows="4" placeholder="Décrivez votre vidéo..."></textarea>
+                        <textarea id="videoDescription" rows="4" placeholder="Décrivez l'épisode..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="videoTags">Tags</label>
-                        <input type="text" id="videoTags" placeholder="Tags séparés par des virgules">
+                        <label for="videoTags">Catégories</label>
+                        <input type="text" id="videoTags" placeholder="Ex: Shonen, Action, Aventure">
                     </div>
                     <div class="form-group">
                         <label>Visibilité</label>
                         <div class="visibility-options">
                             <label><input type="radio" name="visibility" value="public" checked> Public</label>
                             <label><input type="radio" name="visibility" value="private"> Privé</label>
-                            <label><input type="radio" name="visibility" value="unlisted"> Non listé</label>
                         </div>
+                    </div>
+                    <div class="copyright-notice">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>En publiant, vous certifiez que vous possédez les droits ou avez l'autorisation de partager ce contenu.</p>
                     </div>
                     <div class="form-buttons">
                         <button class="prev-step-btn" onclick="prevUploadStep()">Précédent</button>
@@ -240,28 +266,36 @@
                 <!-- Étape 3: Vérification et upload -->
                 <div id="uploadStep3" class="upload-step-content">
                     <div class="verification-content">
-                        <div class="verification-success">
-                            <i class="fas fa-check-circle"></i>
-                            <h3>Vérification du contenu</h3>
-                            <p>Vérification des droits d'auteur en cours...</p>
+                        <div class="verification-check">
+                            <i class="fas fa-copyright"></i>
+                            <h3>Vérification des droits d'auteur</h3>
+                            <p>Analyse en cours de votre contenu...</p>
                             <div class="verification-progress">
                                 <div class="progress-bar">
                                     <div class="progress-fill" id="verificationProgress"></div>
                                 </div>
                                 <span id="progressText">0%</span>
                             </div>
-                            <p id="verificationStatus">Vérification des droits d'auteur...</p>
+                            <div id="verificationResult">
+                                <p id="verificationStatus">Vérification en cours...</p>
+                                <div id="copyrightIssues" class="copyright-issues" style="display: none;">
+                                    <h4>⚠️ Problèmes détectés:</h4>
+                                    <ul id="issuesList"></ul>
+                                    <p>Votre vidéo ne peut pas être publiée sans résoudre ces problèmes.</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="video-summary">
-                            <h4>Résumé de votre vidéo:</h4>
-                            <p><strong>Titre:</strong> <span id="summaryTitle"></span></p>
+                            <h4>Résumé de votre publication:</h4>
+                            <p><strong>Anime:</strong> <span id="summaryTitle"></span></p>
+                            <p><strong>Épisode:</strong> <span id="summaryEpisode"></span></p>
                             <p><strong>Fichier:</strong> <span id="summaryFile"></span></p>
                             <p><strong>Visibilité:</strong> <span id="summaryVisibility"></span></p>
                         </div>
                     </div>
                     <div class="form-buttons">
                         <button class="prev-step-btn" onclick="prevUploadStep()">Précédent</button>
-                        <button class="upload-submit-btn" onclick="submitVideo()" disabled>Publier la vidéo</button>
+                        <button class="upload-submit-btn" onclick="submitVideo()" disabled>Publier l'épisode</button>
                     </div>
                 </div>
             </div>
@@ -272,7 +306,7 @@
     <div id="authModal" class="modal">
         <div class="modal-content auth-modal-content">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-            <h2>Connexion / Inscription</h2>
+            <h2><i class="fas fa-user"></i> Connexion à Animeref</h2>
             
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="switchAuthTab('login')">Connexion</button>
@@ -281,42 +315,50 @@
             
             <div id="loginForm" class="auth-form">
                 <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" placeholder="votre@email.com">
+                    <label for="loginEmail">Email *</label>
+                    <input type="email" id="loginEmail" placeholder="votre@email.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">Mot de passe</label>
-                    <input type="password" id="loginPassword" placeholder="Votre mot de passe">
+                    <label for="loginPassword">Mot de passe *</label>
+                    <input type="password" id="loginPassword" placeholder="Votre mot de passe" required>
                 </div>
                 <button class="auth-submit-btn" onclick="login()">Se connecter</button>
                 
                 <div class="auth-divider">
-                    <span>Ou</span>
+                    <span>Ou continuer avec</span>
                 </div>
                 
                 <button class="google-auth-btn" onclick="loginWithGoogle()">
-                    <i class="fab fa-google"></i> Se connecter avec Google
+                    <i class="fab fa-google"></i> Google
                 </button>
+                
+                <div class="auth-note">
+                    <p>Vous devez utiliser un véritable email pour vous connecter.</p>
+                </div>
             </div>
             
             <div id="signupForm" class="auth-form" style="display: none;">
                 <div class="form-group">
-                    <label for="signupName">Nom d'utilisateur</label>
-                    <input type="text" id="signupName" placeholder="Votre nom d'utilisateur">
+                    <label for="signupName">Nom d'utilisateur *</label>
+                    <input type="text" id="signupName" placeholder="Choisissez un pseudonyme" required>
                 </div>
                 <div class="form-group">
-                    <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" placeholder="votre@email.com">
+                    <label for="signupEmail">Email *</label>
+                    <input type="email" id="signupEmail" placeholder="votre@email.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="signupPassword">Mot de passe</label>
-                    <input type="password" id="signupPassword" placeholder="Créez un mot de passe">
+                    <label for="signupPassword">Mot de passe *</label>
+                    <input type="password" id="signupPassword" placeholder="Minimum 8 caractères" required minlength="8">
                 </div>
                 <div class="form-group">
-                    <label for="confirmPassword">Confirmer le mot de passe</label>
-                    <input type="password" id="confirmPassword" placeholder="Retapez votre mot de passe">
+                    <label for="confirmPassword">Confirmer le mot de passe *</label>
+                    <input type="password" id="confirmPassword" placeholder="Retapez votre mot de passe" required>
                 </div>
                 <button class="auth-submit-btn" onclick="signup()">S'inscrire</button>
+                
+                <div class="auth-note">
+                    <p>En vous inscrivant, vous acceptez nos conditions d'utilisation.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -325,27 +367,96 @@
     <div id="donateModal" class="modal">
         <div class="modal-content donate-modal-content">
             <span class="close-modal" onclick="closeDonateModal()">&times;</span>
-            <h2>Soutenir la plateforme</h2>
+            <h2><i class="fas fa-heart"></i> Soutenir Animeref</h2>
             <div class="donate-info">
-                <p>Les dons nous aident à maintenir la plateforme et à ajouter de nouvelles fonctionnalités.</p>
-                <p>Les dons sont <strong>volontaires</strong> et <strong>non obligatoires</strong>.</p>
+                <p>Votre soutien nous aide à maintenir la plateforme et à ajouter de nouvelles fonctionnalités.</p>
                 <div class="contact-info">
-                    <h3>Pour faire un don:</h3>
-                    <p><i class="fas fa-phone"></i> <strong>Téléphone:</strong> (+225) 07-XX-XX-XX-XX</p>
-                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> support@tubevision.com</p>
-                    <p class="donation-note">L'argent sera reçu directement sur le téléphone via mobile money</p>
+                    <h3>Pour faire un don direct:</h3>
+                    <p><i class="fas fa-phone"></i> <strong>Mobile Money:</strong> (+225) 07-00-00-00-00</p>
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> dons@animeref.com</p>
+                    <p class="donation-note">Envoyez "DON" par SMS ou WhatsApp avec le montant</p>
                 </div>
-                <div class="donation-options">
-                    <h3>Montants suggérés:</h3>
-                    <div class="donation-amounts">
-                        <button class="donation-amount" onclick="selectDonationAmount(5)">5€</button>
-                        <button class="donation-amount" onclick="selectDonationAmount(10)">10€</button>
-                        <button class="donation-amount" onclick="selectDonationAmount(20)">20€</button>
-                        <button class="donation-amount" onclick="selectDonationAmount(50)">50€</button>
-                    </div>
-                    <div class="custom-donation">
-                        <input type="number" id="customAmount" placeholder="Montant personnalisé" min="1">
-                        <button class="custom-donate-btn" onclick="processCustomDonation()">Donner</button>
+                
+                <div class="payment-section">
+                    <h3>Paiement par carte bancaire</h3>
+                    <div class="payment-form">
+                        <div class="form-group">
+                            <label for="cardNumber">Numéro de carte *</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate">Date d'expiration *</label>
+                                <input type="text" id="expiryDate" placeholder="MM/AA" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV *</label>
+                                <input type="password" id="cvv" placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cardName">Nom sur la carte *</label>
+                            <input type="text" id="cardName" placeholder="Nom Prénom">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Pays *</label>
+                            <select id="country">
+                                <option value="">Sélectionnez un pays</option>
+                                <option value="CI">Côte d'Ivoire</option>
+                                <option value="FR">France</option>
+                                <option value="SN">Sénégal</option>
+                                <option value="CM">Cameroun</option>
+                                <option value="TG">Togo</option>
+                                <option value="BJ">Bénin</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address1">Adresse ligne 1 *</label>
+                            <input type="text" id="address1" placeholder="Numéro et rue">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address2">Adresse ligne 2</label>
+                            <input type="text" id="address2" placeholder="Appartement, étage, etc.">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">Ville *</label>
+                                <input type="text" id="city" placeholder="Ville">
+                            </div>
+                            <div class="form-group">
+                                <label for="postalCode">Code postal *</label>
+                                <input type="text" id="postalCode" placeholder="Code postal">
+                            </div>
+                        </div>
+                        
+                        <div class="donation-options">
+                            <h4>Montant du don:</h4>
+                            <div class="donation-amounts">
+                                <button class="donation-amount" onclick="selectDonationAmount(5)">5€</button>
+                                <button class="donation-amount" onclick="selectDonationAmount(10)">10€</button>
+                                <button class="donation-amount" onclick="selectDonationAmount(20)">20€</button>
+                                <button class="donation-amount" onclick="selectDonationAmount(50)">50€</button>
+                            </div>
+                            <div class="custom-donation">
+                                <input type="number" id="customAmount" placeholder="Autre montant" min="1">
+                                <span>€</span>
+                            </div>
+                        </div>
+                        
+                        <button class="process-payment-btn" onclick="processPayment()">
+                            <i class="fas fa-lock"></i> Payer maintenant
+                        </button>
+                        
+                        <div class="payment-security">
+                            <i class="fas fa-shield-alt"></i>
+                            <p>Paiement sécurisé SSL - Vos données sont cryptées</p>
+                        </div>
                     </div>
                 </div>
             </div>
