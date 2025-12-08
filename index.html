@@ -14,6 +14,41 @@
 <body>
     <!-- Header -->
     <header>
+        <header>
+    <div class="logo">
+        <i class="fas fa-play-circle"></i>
+        <span>ANIMEREF</span>
+    </div>
+    
+    <nav>
+        <ul>
+            <li><a href="#" id="nav-home" class="nav-link active"><i class="fas fa-home"></i> Accueil</a></li>
+            <li><a href="#" id="nav-history" class="nav-link"><i class="fas fa-history"></i> Historique</a></li>
+            <li><a href="#" id="nav-library" class="nav-link"><i class="fas fa-film"></i> Bibliothèque</a></li>
+            <li><a href="#" id="nav-subscriptions" class="nav-link"><i class="fas fa-users"></i> Abonnements</a></li>
+            <li><a href="#" id="nav-upload" class="nav-link"><i class="fas fa-upload"></i> Upload</a></li>
+        </ul>
+    </nav>
+    
+    <div class="header-right">
+        <!-- Bouton Dons -->
+        <button id="donate-btn" class="btn btn-warning">
+            <i class="fas fa-heart"></i> Faire un don
+        </button>
+        
+        <!-- Section non connecté -->
+        <div id="auth-section" class="auth-section">
+            <button id="login-btn" class="btn btn-secondary">Connexion</button>
+            <button id="register-btn" class="btn btn-primary">Inscription</button>
+        </div>
+        
+        <!-- Section connecté -->
+        <div id="user-section" class="user-section" style="display: none;">
+            <span id="username-display" style="margin-right: 10px;"></span>
+            <button id="logout-btn" class="btn btn-secondary">Déconnexion</button>
+        </div>
+    </div>
+</header>
         <div class="logo">
             <i class="fas fa-play-circle"></i>
             <span>ANIMEREF</span>
